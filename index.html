@@ -1,0 +1,1300 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HF 探索打卡 · Hugging Face 系统学习路径</title>
+<style>
+:root{
+  --bg:#0a0e15; --bg2:#0e141d; --panel:#131b26; --panel2:#17202d;
+  --line:#22303f; --line2:#2d3d4f;
+  --tx:#e8eef7; --dim:#8fa3ba; --dim2:#61748a;
+  --acc:#ffd21e; --acc2:#f7b500;
+  --ok:#34d399; --okdim:#0f3d30;
+  --blue:#7dd3fc; --violet:#a78bfa; --rose:#fb7185;
+  --mono:ui-monospace,"Cascadia Code",Consolas,"SF Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 500px at 12% -10%, rgba(255,210,30,.09), transparent 60%),
+    radial-gradient(900px 480px at 92% 0%, rgba(125,211,252,.07), transparent 60%),
+    var(--bg);
+  color:var(--tx);
+  font:15px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:80px;
+}
+.wrap{max-width:1060px;margin:0 auto;padding:0 18px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── header ── */
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);
+  background:rgba(10,14,21,.82);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:16px;padding:12px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
+.brand .em{font-size:22px;filter:drop-shadow(0 0 10px rgba(255,210,30,.5))}
+.brand small{display:block;font-weight:500;font-size:11px;color:var(--dim2);letter-spacing:.6px;text-transform:uppercase}
+.hd .sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
+  background:var(--panel);border:1px solid var(--line);font-size:13px;white-space:nowrap}
+.pill b{font-family:var(--mono);color:var(--acc)}
+.pill.hot{border-color:rgba(255,210,30,.35);background:linear-gradient(180deg,rgba(255,210,30,.12),rgba(255,210,30,.04))}
+.ring{--p:0;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:conic-gradient(var(--acc) calc(var(--p)*1%), var(--line) 0);
+  position:relative}
+.ring::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--bg)}
+.ring span{position:relative;font:600 11px/1 var(--mono);color:var(--tx)}
+
+/* ── tabs ── */
+nav.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 0 0;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;color:var(--dim);padding:9px 15px;
+  border-radius:10px 10px 0 0;cursor:pointer;font:500 13.5px/1 inherit;white-space:nowrap}
+.tab:hover{color:var(--tx);background:var(--panel)}
+.tab[aria-selected="true"]{color:#111;background:var(--acc);font-weight:700}
+
+/* ── cards ── */
+main{padding-top:22px}
+.card{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);
+  border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{margin:0 0 4px;font-size:17px;letter-spacing:.2px}
+.card h2 .n{font-family:var(--mono);color:var(--acc);font-size:13px;margin-right:8px}
+.sub{color:var(--dim);font-size:13px;margin:0 0 16px}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+
+/* ── checkin ── */
+.checkin{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.flame{font-size:44px;line-height:1;filter:drop-shadow(0 0 14px rgba(255,120,30,.45))}
+.flame.off{filter:grayscale(1);opacity:.35}
+.streak{font:800 40px/1 var(--mono);color:var(--acc)}
+.streak small{font:500 12px/1.4 inherit;color:var(--dim);display:block;letter-spacing:.5px;margin-top:6px}
+.btn{border:1px solid var(--line2);background:var(--panel2);color:var(--tx);padding:11px 20px;
+  border-radius:11px;cursor:pointer;font:600 14px/1 inherit;transition:.15s}
+.btn:hover{border-color:var(--acc);color:var(--acc)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:#151515}
+.btn.primary:hover{background:var(--acc2);color:#151515}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
+
+/* ── heatmap ── */
+.heat{display:flex;gap:3px;margin-top:6px}
+.heat .wk{display:flex;flex-direction:column;gap:3px}
+.heat i{width:11px;height:11px;border-radius:3px;background:#1b2531;display:block}
+.heat i.l1{background:#4a4218}
+.heat i.l2{background:#8a7a1c}
+.heat i.l3{background:var(--acc)}
+.heat i.today{outline:1px solid var(--acc);outline-offset:1px}
+.heat i.future{opacity:.25}
+.legend{display:flex;gap:10px;font-size:11px;color:var(--dim2);margin-top:8px;align-items:center}
+
+/* ── items ── */
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+input[type=search],input[type=text]{background:var(--bg);border:1px solid var(--line);color:var(--tx);
+  padding:9px 12px;border-radius:10px;font:14px inherit;outline:none;min-width:220px}
+input[type=search]:focus{border-color:var(--acc)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--dim);padding:8px 13px;font:13px inherit;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--panel2);color:var(--acc);font-weight:600}
+
+.lvl{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;background:var(--bg2)}
+.lvl>.head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
+.lvl>.head:hover{background:var(--panel)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.lvl .t{font-weight:600;font-size:14.5px;flex:1}
+.lvl .cnt{font:600 12px/1 var(--mono);color:var(--dim)}
+.bar{height:5px;background:#1b2531;border-radius:99px;overflow:hidden;width:90px;flex:none}
+.bar>i{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .35s}
+.caret{color:var(--dim2);transition:.2s;font-size:12px}
+.lvl.open .caret{transform:rotate(90deg)}
+.items{display:none;border-top:1px solid var(--line)}
+.lvl.open .items{display:block}
+
+.item{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(34,48,63,.55)}
+.item:last-child{border-bottom:0}
+.item:hover{background:rgba(23,32,45,.6)}
+.ck{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line2);background:transparent;
+  cursor:pointer;flex:none;margin-top:2px;position:relative;transition:.15s}
+.ck:hover{border-color:var(--acc)}
+.ck[aria-checked="true"]{background:var(--ok);border-color:var(--ok)}
+.ck[aria-checked="true"]::after{content:"";position:absolute;left:6px;top:2.5px;width:5px;height:10px;
+  border:solid #06281e;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.item .body{flex:1;min-width:0}
+.item .t{font-size:14px;font-weight:500}
+.item .t .lnk{font-size:12px;color:var(--dim2);margin-left:6px;white-space:nowrap}
+.item .t .lnk:hover{color:var(--acc)}
+.item .d{font-size:12.5px;color:var(--dim);margin-top:3px}
+.item.done .t{color:var(--dim2);text-decoration:line-through;text-decoration-color:rgba(52,211,153,.5)}
+.item .note{width:100%;margin-top:7px;background:var(--bg);border:1px solid var(--line);color:var(--tx);
+  border-radius:8px;padding:6px 9px;font:12.5px/1.5 inherit;resize:vertical;height:31px;transition:height .15s;outline:none}
+.item .note:focus{height:78px;border-color:var(--acc)}
+
+/* ── quests ── */
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.q{border:1px solid var(--line);border-radius:13px;padding:14px;background:var(--bg2);display:flex;gap:11px}
+.q.done{background:linear-gradient(180deg,rgba(52,211,153,.09),var(--bg2));border-color:rgba(52,211,153,.35)}
+.q .t{font-size:13.5px;font-weight:500}
+.q .d{font-size:12px;color:var(--dim);margin-top:4px}
+.q .tag{display:inline-block;font:600 10.5px/1 var(--mono);color:var(--acc);background:rgba(255,210,30,.1);
+  border:1px solid rgba(255,210,30,.25);padding:4px 7px;border-radius:6px;margin-top:8px;letter-spacing:.4px}
+
+/* ── live table ── */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;color:var(--dim2);font:600 11.5px/1 inherit;letter-spacing:.6px;text-transform:uppercase;
+  padding:0 10px 10px 0;border-bottom:1px solid var(--line)}
+td{padding:9px 10px 9px 0;border-bottom:1px solid rgba(34,48,63,.5)}
+td.id{font-family:var(--mono);font-size:12.5px}
+td.num{font-family:var(--mono);text-align:right;color:var(--dim);white-space:nowrap}
+tr:hover td{background:rgba(23,32,45,.6)}
+.badge{display:inline-block;font:11px/1 var(--mono);padding:4px 8px;border-radius:6px;
+  background:var(--panel2);border:1px solid var(--line);color:var(--dim)}
+
+/* ── stats ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.stat .v{font:800 24px/1.1 var(--mono);color:var(--acc)}
+.stat .k{font-size:11.5px;color:var(--dim2);margin-top:6px;letter-spacing:.4px}
+.bgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.bg-item{display:flex;gap:11px;align-items:center;padding:11px 13px;border-radius:11px;
+  border:1px solid var(--line);background:var(--bg2);opacity:.42;transition:.2s}
+.bg-item.on{opacity:1;border-color:rgba(255,210,30,.4);background:linear-gradient(180deg,rgba(255,210,30,.09),var(--bg2))}
+.bg-item .ic{font-size:20px;filter:grayscale(1)}
+.bg-item.on .ic{filter:none}
+.bg-item .n{font-size:13px;font-weight:600}
+.bg-item .d{font-size:11.5px;color:var(--dim2)}
+.skill{margin-bottom:11px}
+.skill .row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+.skill .bar{width:100%;height:7px}
+.skill .bar>i{background:linear-gradient(90deg,var(--acc2),var(--acc))}
+
+/* ── misc ── */
+.empty{color:var(--dim2);font-size:13px;padding:20px;text-align:center}
+kbd{font:11px var(--mono);background:var(--panel2);border:1px solid var(--line2);border-bottom-width:2px;
+  border-radius:5px;padding:2px 5px;color:var(--dim)}
+footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim2);font-size:12px}
+.hide{display:none!important}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--acc);color:#151515;
+  font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:11px;opacity:0;pointer-events:none;
+  transition:.25s;z-index:99;box-shadow:0 8px 30px rgba(255,210,30,.28)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hd">
+      <div class="brand">
+        <span class="em">🤗</span>
+        <div>HF 探索打卡<small>Hugging Face 系统学习 · 42 课 + 12 探索</small></div>
+      </div>
+      <div class="sp"></div>
+      <span class="pill hot" title="连续打卡天数">🔥 <b id="hStreak">0</b> 天</span>
+      <span class="pill" title="经验值">⚡ <b id="hXp">0</b> XP</span>
+      <span class="pill" title="课程完成度"><b id="hDone">0</b>/42</span>
+      <div class="ring" id="hRing" title="总进度"><span id="hPct">0%</span></div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab" data-act="tab" data-view="today" aria-selected="true">今日打卡</button>
+      <button class="tab" data-act="tab" data-view="path"  aria-selected="false">学习路径</button>
+      <button class="tab" data-act="tab" data-view="quests" aria-selected="false">探索任务</button>
+      <button class="tab" data-act="tab" data-view="live"  aria-selected="false">实时榜单</button>
+      <button class="tab" data-act="tab" data-view="sync"  aria-selected="false">云同步</button>
+      <button class="tab" data-act="tab" data-view="stats" aria-selected="false">进度与徽章</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ══════════ 今日打卡 ══════════ -->
+  <section id="v-today">
+    <div class="grid2">
+      <div class="card">
+        <h2><span class="n">01</span>今日打卡</h2>
+        <p class="sub" id="todayDate">—</p>
+        <div class="checkin">
+          <div class="flame" id="flame">🔥</div>
+          <div>
+            <div class="streak"><span id="bigStreak">0</span></div>
+            <small>连续天数 · 最长 <span id="bestStreak">0</span> 天 · 累计 <span id="totalDays">0</span> 天</small>
+          </div>
+          <div class="sp" style="flex:1"></div>
+          <button class="btn primary" id="btnCheckin" data-act="checkin">今天打卡</button>
+        </div>
+        <div style="margin-top:18px">
+          <div class="sub" style="margin:0 0 8px">最近 12 周</div>
+          <div class="heat" id="heat"></div>
+          <div class="legend">
+            <span>少</span><i style="width:11px;height:11px;border-radius:3px;background:#1b2531"></i>
+            <i style="width:11px;height:11px;border-radius:3px;background:#4a4218"></i>
+            <i style="width:11px;height:11px;border-radius:3px;background:#8a7a1c"></i>
+            <i style="width:11px;height:11px;border-radius:3px;background:#ffd21e"></i><span>多 · 每格一天，颜色 = 当天动的次数</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">02</span>今日微任务</h2>
+        <p class="sub">每天轮换一个 5–15 分钟的小动作，养手感。</p>
+        <div id="micro" style="font-size:14.5px;line-height:1.7"></div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+          <h2 style="font-size:15px"><span class="n">03</span>接着往下</h2>
+          <p class="sub" style="margin-bottom:10px">下一个未完成的课：</p>
+          <div id="nextUp"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">04</span>怎么用这套东西</h2>
+      <p class="sub">三步：打卡 → 做一课 → 写一句笔记。进度全存在浏览器本地，不上传任何地方。</p>
+      <div class="grid2" style="gap:12px">
+        <div>
+          <p style="margin:0;font-size:13.5px;color:var(--dim)">
+            <b style="color:var(--tx)">① 打卡</b>：每天点一次「今天打卡」，断签会归零（但累计天数不清）。<br>
+            <b style="color:var(--tx)">② 学习路径</b>：6 个阶段 42 课，从「认路」到「发布作品集」，每课都有<em>验证标准</em>——不是看完视频就算过，是能把结果跑出来。<br>
+            <b style="color:var(--tx)">③ 探索任务</b>：12 个必须动手的真实动作，做完基本就有可展示的东西了。
+          </p>
+        </div>
+        <div>
+          <p style="margin:0;font-size:13.5px;color:var(--dim)">
+            <b style="color:var(--tx)">网络提示</b>：你这台机器直连 huggingface.co 会超时，所以所有链接默认走 <code style="font-family:var(--mono);color:var(--acc)">hf-mirror.com</code> 镜像。真实下载前记得设：
+          </p>
+          <pre style="margin:8px 0 0;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:9px;font:12px/1.7 var(--mono);color:var(--dim);overflow:auto">$env:HF_ENDPOINT="https://hf-mirror.com"
+$env:HF_HOME="D:\dev_cache\huggingface"</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 学习路径 ══════════ -->
+  <section id="v-path" class="hide">
+    <div class="card">
+      <h2><span class="n">PATH</span>42 课 · 从认路到发布</h2>
+      <p class="sub">按顺序做，每课都写了「怎么算过」。展开阶段看详情，笔记会自动存。</p>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="搜索课程…" title="试试 tokenizer / LoRA / vLLM">
+        <div class="seg" id="filter">
+          <button data-act="filter" data-f="all"  aria-pressed="true">全部</button>
+          <button data-act="filter" data-f="todo" aria-pressed="false">未完成</button>
+          <button data-act="filter" data-f="done" aria-pressed="false">已完成</button>
+        </div>
+        <button class="btn sm" data-act="expand">全部展开</button>
+        <button class="btn sm" data-act="collapse">全部收起</button>
+      </div>
+      <div id="pathList"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 探索任务 ══════════ -->
+  <section id="v-quests" class="hide">
+    <div class="card">
+      <h2><span class="n">QUEST</span>12 个必须动手的探索任务</h2>
+      <p class="sub">这些不是阅读，是动作。全部做完，你会有一个能给别人看的 HF 主页。</p>
+      <div class="qgrid" id="qList"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 实时榜单 ══════════ -->
+  <section id="v-live" class="hide">
+    <div class="card">
+      <h2><span class="n">LIVE</span>当下趋势榜 · 拿它当探索入口</h2>
+      <p class="sub" id="liveMeta">点「拉取」从镜像 API 取实时数据；失败则用内置快照。</p>
+      <div class="toolbar">
+        <button class="btn sm primary" data-act="fetch">拉取实时榜</button>
+        <span class="badge" id="liveSrc">未加载</span>
+        <div class="sp" style="flex:1"></div>
+        <span style="font-size:12px;color:var(--dim2)">榜单每小时都在变，看「下载量」比看「likes」靠谱</span>
+      </div>
+      <div id="liveBody"></div>
+    </div>
+    <div class="card">
+      <h2><span class="n">TIP</span>怎么读这些数字</h2>
+      <div class="grid2" style="gap:14px">
+        <div style="font-size:13px;color:var(--dim)">
+          <p style="margin:0 0 8px"><b style="color:var(--tx)">trendingScore</b>：近段时间的加权热度。容易被「新发布 + 社区量化包」推高，一个基座能刷出 5 个衍生版。</p>
+          <p style="margin:0 0 8px"><b style="color:var(--tx)">likes</b>：人气，但会被人为追。名字超长的融合模型 likes 常常虚高。</p>
+          <p style="margin:0"><b style="color:var(--tx)">downloads</b>：真实使用量（近 30 天）。判断一个模型能不能用，先看这个量级。</p>
+        </div>
+        <div style="font-size:13px;color:var(--dim)">
+          <p style="margin:0 0 8px"><b style="color:var(--tx)">pipeline_tag</b>：任务类型。顺着它去 <code style="font-family:var(--mono)">/tasks</code> 找同类模型。</p>
+          <p style="margin:0 0 8px"><b style="color:var(--tx)">createdAt</b>：太新（&lt;1 周）别急着进生产，等社区踩坑。</p>
+          <p style="margin:0">点模型名会跳镜像页，<code style="font-family:var(--mono)">Files</code> 里能看到权重分片和 <code style="font-family:var(--mono)">tokenizer.json</code>。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 云同步 ══════════ -->
+  <section id="v-sync" class="hide">
+    <div class="card">
+      <h2><span class="n">SYNC</span>跨设备同步 · 私有 Gist 云存档</h2>
+      <p class="sub">同一套打卡记录，多台电脑共用。token 只存在这台电脑的浏览器里，不会写进页面、不会进导出文件。</p>
+      <div id="syncState"></div>
+
+      <div class="toolbar" style="margin-top:16px">
+        <input type="password" id="tokenIn" placeholder="粘贴 GitHub token（只需 gist 权限）" style="flex:1;min-width:260px">
+        <button class="btn sm" data-act="save-token">保存 token</button>
+        <button class="btn sm" data-act="clear-token">清除</button>
+      </div>
+      <div class="toolbar">
+        <input type="text" id="gistIn" placeholder="Gist ID（已有存档就粘贴；第一次用点右边创建）" style="flex:1;min-width:260px">
+        <button class="btn sm" data-act="save-gist">保存 ID</button>
+        <button class="btn sm primary" data-act="create-gist">创建新存档</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" data-act="sync">立即双向同步</button>
+        <label style="display:flex;gap:7px;align-items:center;font-size:13px;color:var(--dim);cursor:pointer">
+          <input type="checkbox" id="autoChk" data-act="toggle-auto"> 自动同步（改动后 4 秒上传，打开页面时拉取）
+        </label>
+        <div style="flex:1"></div>
+        <span class="badge" id="devName">—</span>
+      </div>
+      <div id="syncLog" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">HOW</span>三步接通（每台电脑做一次）</h2>
+      <div class="grid2" style="gap:16px">
+        <div style="font-size:13.5px;color:var(--dim)">
+          <p style="margin:0 0 10px"><b style="color:var(--tx)">① 造一个 token</b><br>
+          GitHub → Settings → Developer settings → Personal access tokens →
+          <b>Tokens (classic)</b> → Generate new token → 只勾 <code style="font-family:var(--mono);color:var(--acc)">gist</code> → 设 90 天过期。
+          也可以用 fine-grained token，权限只给 <b>Gists: Read and write</b>。</p>
+          <p style="margin:0"><b style="color:var(--tx)">② 建存档</b><br>
+          把 token 粘进上面的框 → 点「创建新存档」→ 得到一个 Gist ID（自动填好）。</p>
+        </div>
+        <div style="font-size:13.5px;color:var(--dim)">
+          <p style="margin:0 0 10px"><b style="color:var(--tx)">③ 第二台电脑</b><br>
+          打开同一个网址 → 粘同一个 token + 同一个 Gist ID → 点「立即双向同步」。以后开页面自动拉、改完自动推。</p>
+          <p style="margin:0"><b style="color:var(--tx)">合并规则</b><br>
+          课程勾选 / 笔记：按最后修改时间取胜（所以取消勾选也能同步）；打卡日期：取并集；每日动作数：取较大值。永远不丢你本机已有的进度。</p>
+        </div>
+      </div>
+      <p class="sub" style="margin:16px 0 0;color:#f59e0b">
+        ⚠️ token 等同于你 Gist 的钥匙：这台电脑的浏览器本地存储里会有明文。公用电脑别保存，用完点「清除」。
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════ 进度与徽章 ══════════ -->
+  <section id="v-stats" class="hide">
+    <div class="card">
+      <h2><span class="n">STAT</span>进度总览</h2>
+      <div class="stats">
+        <div class="stat"><div class="v" id="sXp">0</div><div class="k">XP 经验值</div></div>
+        <div class="stat"><div class="v" id="sLessons">0</div><div class="k">课程完成 / 42</div></div>
+        <div class="stat"><div class="v" id="sQuests">0</div><div class="k">探索任务 / 12</div></div>
+        <div class="stat"><div class="v" id="sNotes">0</div><div class="k">写的笔记条数</div></div>
+      </div>
+      <div id="skills"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">BADGE</span>徽章 <span id="badgeCount" style="font-size:12px;color:var(--dim2);font-weight:400"></span></h2>
+      <p class="sub">全部自动判定，不需要手动领。</p>
+      <div class="bgs" id="badges"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">DATA</span>数据管理</h2>
+      <p class="sub">进度存在本机 localStorage（key: <code style="font-family:var(--mono)">hf-quest-v1</code>）。换浏览器/换电脑用导出导入。</p>
+      <div class="toolbar">
+        <button class="btn sm" data-act="export">导出进度 JSON</button>
+        <button class="btn sm" data-act="import">导入进度</button>
+        <button class="btn sm" data-act="reset" style="border-color:rgba(251,113,133,.4);color:var(--rose)">清空全部</button>
+        <div class="sp" style="flex:1"></div>
+        <label style="font-size:12.5px;color:var(--dim);display:flex;align-items:center;gap:7px">
+          链接站：
+          <select id="baseSel" style="background:var(--bg);border:1px solid var(--line);color:var(--tx);padding:6px 9px;border-radius:8px;font-size:12.5px">
+            <option value="https://hf-mirror.com">hf-mirror.com（国内可用）</option>
+            <option value="https://huggingface.co">huggingface.co（官方）</option>
+          </select>
+        </label>
+      </div>
+      <div id="history"></div>
+    </div>
+  </section>
+
+  <footer>
+    单文件离线版 · 无外部依赖 · 进度只存在你自己的浏览器里<br>
+    链接默认走 <code style="font-family:var(--mono)">hf-mirror.com</code>，因为本机直连 huggingface.co 超时（已验证 curl: 28）。
+  </footer>
+</main>
+
+<input type="file" id="fileIn" accept=".json" class="hide">
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ═══════════════════ 内容数据 ═══════════════════ */
+
+const LEVELS = [
+  { id:"L0", name:"起步 · 认路", color:"#ffd21e",
+    desc:"先搞清这台机器（Hub）上有哪些零件，别急着下载权重。",
+    items:[
+      { id:"l0-1", t:"注册账号并完善 profile",
+        d:"动作：注册 → 填头像、bio、时区。验证：你的 /用户名 主页能打开，且 bio 写了一句话定位。",
+        l:"/join" },
+      { id:"l0-2", t:"认清六个入口", d:"Models / Datasets / Spaces / Papers / Posts / Chat+Inference。验证：一句话说出各自的用途，不看页面也能背下来。", l:"/" },
+      { id:"l0-3", t:"拆解一个模型页",
+        d:"看 Files 分片、model card、Tags、License、Downloads、Use this model。验证：能解释 safetensors 为什么要分片（2GB 单文件上限）。",
+        l:"/docs/hub/models-the-hub" },
+      { id:"l0-4", t:"搞懂 gated 模型与许可证",
+        d:"找 2 个 gated 模型、2 个 apache-2.0 模型。验证：判断各自能不能直接商用，写下结论。",
+        l:"/docs/hub/models-gated" },
+      { id:"l0-5", t:"掌握搜索语法",
+        d:"author: task: library: language: size sort:downloads 组合过滤。验证：用 3 个过滤器组合精准搜到一个模型。",
+        l:"/models" },
+      { id:"l0-6", t:"关注与组织",
+        d:"like / watch / 加入 organization。验证：关注 3 个组织（如 Qwen、deepseek-ai、google），首页动态开始有内容。",
+        l:"/organizations" }
+    ]},
+
+  { id:"L1", name:"本地跑通 · 第一次推理", color:"#7dd3fc",
+    desc:"这一阶段的唯一目标是：屏幕上有输出。所有环境问题在这里一次性解决。",
+    items:[
+      { id:"l1-1", t:"装 Python 环境", d:"推荐 uv 或 venv，Python 3.10+。验证：python -c \"import sys;print(sys.version)\" 有输出（注意本机目前 python 是商店占位符，需要真装）。", l:"/docs/transformers/installation" },
+      { id:"l1-2", t:"装核心三件", d:"pip install transformers datasets accelerate + torch。验证：python -c \"import transformers\" 不报错。", l:"/docs/transformers/installation" },
+      { id:"l1-3", t:"配镜像与缓存路径", d:"设 HF_ENDPOINT=https://hf-mirror.com、HF_HOME=D:\\dev_cache\\huggingface、HF_HUB_ENABLE_HF_TRANSFER=1。验证：下载不再超时。", l:"/docs/huggingface_hub/guides/download" },
+      { id:"l1-4", t:"pipeline 五行跑通", d:"pipeline('sentiment-analysis') 跑一句话。验证：输出 POSITIVE/NEGATIVE 与分数。", l:"/docs/transformers/quicktour" },
+      { id:"l1-5", t:"AutoTokenizer + AutoModel 手动加载", d:"不用 pipeline，自己 tokenizer → model(**inputs)。验证：打印出 logits.shape 并解释每个维度。", l:"/docs/transformers/task_summary" },
+      { id:"l1-6", t:"玩生成参数", d:"temperature / top_p / repetition_penalty / max_new_tokens 各调一次。验证：同一 prompt 两次输出不同，且能解释原因。", l:"/docs/transformers/llm_tutorial" },
+      { id:"l1-7", t:"整仓下载 snapshot_download", d:"用 allow_patterns 只下需要的文件。验证：说清本地缓存目录结构（models--org--name/snapshots/blobs）。", l:"/docs/huggingface_hub/guides/download" },
+      { id:"l1-8", t:"缓存管理与清理", d:"scan_cache_dir() + delete_cache()。验证：清掉至少 1GB，并知道为什么 blobs/snapshots 是硬链接关系。", l:"/docs/huggingface_hub/guides/manage-cache" }
+    ]},
+
+  { id:"L2", name:"数据与词表 · 模型的嘴巴", color:"#a78bfa",
+    desc:"模型只认 token id。这一层不通，后面所有报错都看不懂。",
+    items:[
+      { id:"l2-1", t:"单独用 tokenizers", d:"Tokenizer.from_pretrained + encode。验证：能打印 ids / tokens / offsets / attention_mask 四项，并解释 offsets 是干嘛的。", l:"/docs/tokenizers/index" },
+      { id:"l2-2", t:"读懂 tokenizer.json 五部件", d:"Normalizer → PreTokenizer → Model → PostProcessor → Decoder。验证：打开一个 tokenizer.json，指出每段对应哪个部件。", l:"/docs/tokenizers/pipeline" },
+      { id:"l2-3", t:"load_dataset + streaming", d:"streaming=True 不落盘。验证：处理一个 >5GB 数据集，硬盘空间没变化。", l:"/docs/datasets/quickstart" },
+      { id:"l2-4", t:"数据集卡片与 splits", d:"验证：说清一个数据集的 split 名、字段类型、条数、许可证。", l:"/docs/datasets" },
+      { id:"l2-5", t:"map / filter / DataCollator", d:"把文本转成 input_ids 并组 batch。验证：打印 batch 里每个张量的形状，能对上。", l:"/docs/datasets/process" },
+      { id:"l2-6", t:"上传自己的 dataset", d:"upload_folder 或 push_to_hub。验证：别人能用 load_dataset('你的名/数据集') 加载。", l:"/docs/hub/datasets-adding" }
+    ]},
+
+  { id:"L3", name:"训练与微调 · 让它学你的活", color:"#34d399",
+    desc:"从跑通 Trainer 到 QLoRA，这是最能出成果的一段。",
+    items:[
+      { id:"l3-1", t:"Trainer 跑一个文本分类", d:"小数据集 + 小模型。验证：拿到 eval accuracy 数字，不是「跑完了」。", l:"/docs/transformers/training" },
+      { id:"l3-2", t:"LoRA 原理 + PEFT 配置", d:"r / alpha / target_modules。验证：打印可训练参数占比，应该 <1%。", l:"/docs/peft" },
+      { id:"l3-3", t:"QLoRA 4bit 微调", d:"bitsandbytes load_in_4bit + LoRA。验证：单卡 8GB 也能跑起 7B 级模型。", l:"/docs/transformers/quantization/bitsandbytes" },
+      { id:"l3-4", t:"TRL SFTTrainer", d:"用几十条数据做一次 SFT。验证：loss 曲线下降，模型回答风格有变化。", l:"/docs/trl" },
+      { id:"l3-5", t:"DPO 最小跑通", d:"理解 chosen/rejected 配对。验证：能解释 DPO 和 SFT 的目标函数差在哪。", l:"/docs/trl" },
+      { id:"l3-6", t:"评估与看榜", d:"loss / perplexity / benchmark 三种口径的区别。验证：在 Open LLM Leaderboard 上读懂一列分数。", l:"/spaces/open-llm-leaderboard" },
+      { id:"l3-7", t:"训练日志与断点续训", d:"logging_steps / save_steps / resume_from_checkpoint。验证：手动杀掉训练再恢复，不从头开始。", l:"/docs/transformers/trainer" }
+    ]},
+
+  { id:"L4", name:"推理与部署 · 让它在别人机器上跑", color:"#fb7185",
+    desc:"权重跑得起来 ≠ 服务给得出去。这一段决定你的东西能不能被使用。",
+    items:[
+      { id:"l4-1", t:"量化格式辨析", d:"FP16 / INT8 / GPTQ / AWQ / GGUF / EXL2。验证：做一张表，写清每种在什么硬件上跑、精度损失、是否需要校准数据。", l:"/docs/transformers/quantization" },
+      { id:"l4-2", t:"llama.cpp / ollama 跑 GGUF", d:"下载一个 Q4_K_M。验证：本地起服务并对话，记录 tokens/s 与显存占用。", l:"https://github.com/ggml-org/llama.cpp" },
+      { id:"l4-3", t:"vLLM 起 OpenAI 兼容服务", d:"vllm serve 后 curl /v1/chat/completions。验证：能用 OpenAI SDK 直接指过去。", l:"https://docs.vllm.ai" },
+      { id:"l4-4", t:"Spaces 建一个 Gradio app", d:"从模板起。验证：拿到公开 URL，手机也能打开。", l:"/docs/hub/spaces-sdks-gradio" },
+      { id:"l4-5", t:"Space 里接模型", d:"走 Inference Providers 而不是自己塞权重。验证：改一行代码换供应商，页面仍能跑。", l:"/docs/inference-providers" },
+      { id:"l4-6", t:"Inference Endpoints 概念与成本", d:"实例规格、按秒计费、冷启动。验证：估出「7B 模型常驻一个月」大概多少钱，写下来。", l:"/docs/inference-endpoints" },
+      { id:"l4-7", t:"显存估算", d:"参数 × 字节 + KV cache。验证：不跑代码，算出你要的模型在该卡上最大并发。", l:"/docs/transformers/llm_tutorial" }
+    ]},
+
+  { id:"L5", name:"生产与贡献 · 留下痕迹", color:"#f9a8d4",
+    desc:"会下载只是消费者。这一段把你变成 Hub 上的生产者。",
+    items:[
+      { id:"l5-1", t:"用 CLI 上传模型", d:"huggingface-cli login + upload_folder。验证：你的仓库有正确的 Files 列表。", l:"/docs/huggingface_hub/guides/upload" },
+      { id:"l5-2", t:"写规范的 model card", d:"YAML front-matter：license / language / base_model / tags / library_name。验证：页面右侧出现正确的元信息，可被过滤搜到。", l:"/docs/hub/model-cards" },
+      { id:"l5-3", t:"加上 eval-results", d:"把评测指标写进 metadata。验证：模型卡里出现可读的指标块。", l:"/docs/hub/model-card-metadata" },
+      { id:"l5-4", t:"分支、tag 与 revision", d:"用 revision 固定版本，别用 main。验证：两次调用指定不同 revision，拿到不同权重。", l:"/docs/hub/repository-settings" },
+      { id:"l5-5", t:"Token 类型与权限", d:"read / write / fine-grained。验证：为 CI 单独建一个只读 token，并解释为什么不能给 write。", l:"/settings/tokens" },
+      { id:"l5-6", t:"复现一篇 Daily Paper", d:"从 /papers 挑一篇有模型的。验证：跑通它的 demo，写 3 行「它解决什么 + 我用在哪」。", l:"/papers" },
+      { id:"l5-7", t:"参与社区", d:"在 Discussions 回答问题、或给一个仓库提 PR。验证：拿到一个真实的回复或 merge。", l:"/docs/hub/community" },
+      { id:"l5-8", t:"搭一个作品集", d:"3 个 Space + 1 个自己微调的模型 + 完整卡片。验证：把链接发给一个外行，他能看懂你在做什么。", l:"/spaces" }
+    ]}
+];
+
+const QUESTS = [
+  { id:"q1", tag:"OBSERVE", t:"追踪今日 trending 榜首", d:"打开实时榜第 1 名，读它的 model card，用三句话写出：解决什么问题 / 谁在用 / 有什么限制。" },
+  { id:"q2", tag:"COMPARE", t:"对比 3 个小体量中文模型", d:"筛 language:zh 且 <8B，比较参数量、许可证、月下载量，做成一张表。" },
+  { id:"q3", tag:"RUN", t:"10 分钟内跑通一个 pipeline", d:"任选一个任务（情感/摘要/ASR），记录 install → 出结果的确切耗时。" },
+  { id:"q4", tag:"LOCAL", t:"下载一个 GGUF 本地跑", d:"挑 Q4_K_M，记录文件大小、tokens/s、内存峰值。" },
+  { id:"q5", tag:"MATH", t:"给自己语料算 token 数", d:"用 tokenizers 统计一份真实文本，换 2 个 tokenizer 对比差距（这决定你的 API 账单）。" },
+  { id:"q6", tag:"TRAIN", t:"微调一个 0.5B 做分类", d:"LoRA 即可。目标不是效果好，是走完 保存 → 上传 → 加载 全链路。" },
+  { id:"q7", tag:"SHIP", t:"把一个 demo 部署到 Space", d:"Gradio + 免费 CPU 实例。拿到公开链接，手机开一次。" },
+  { id:"q8", tag:"PAPER", t:"复现一篇 Daily Paper", d:"从 /papers 找有官方实现的，跑通并记录哪一步最卡。" },
+  { id:"q9", tag:"LEGAL", t:"读 3 张卡判商用", d:"找 apache-2.0 / mit / llama 社区许可各一个，写清什么情况下不能进产品。" },
+  { id:"q10", tag:"BIGDATA", t:"streaming 处理一个大数据集", d:">10GB 且不落盘，边流边统计，记录峰值内存。" },
+  { id:"q11", tag:"HYGIENE", t:"清理本机缓存", d:"用 huggingface_hub 的 cache API 找出最占空间的 3 个仓库并删掉。" },
+  { id:"q12", tag:"PUBLISH", t:"发布第一个自己的模型", d:"哪怕是微调的玩具模型，也要有完整 model card、许可证、使用示例。" }
+];
+
+const MICRO = [
+  "打开今日 trending 榜首的模型页，只读 model card 的前三段，写一句「它是给谁用的」。",
+  "用 task 过滤器找一个你这辈子没用过的任务类型（比如 depth-estimation），点进去看 2 个模型。",
+  "找一个体积 <1GB 的模型，看看它的文件列表，猜它为什么这么小。",
+  "读一张 model card 的 license 字段，判断「能不能直接用在收费产品里」。",
+  "去某个热门模型的 Discussions 区，读一条真实提问，试着在心里回答它。",
+  "查一个模型的月下载量，再想想：为什么是它而不是同期的竞品？",
+  "对比同一个模型的 FP16 与 Q4_K_M GGUF 的体积和文件数。",
+  "翻一篇 /papers 的 Daily Paper，只读 TL;DR 和图 1，写下它的一句话结论。",
+  "检查本地缓存目录有多大，删掉一个确定不会再用的仓库。",
+  "用 tags 筛 language:zh，记下 3 个你没听过的中文模型。",
+  "给一个你真正用过的模型点 like——这是最低成本的社区反馈。",
+  "把今天学到的一个结论写成 3 行字，存进课程笔记里。"
+];
+
+const SNAPSHOT = {
+  date:"2026-10-28",
+  items:[
+    { id:"deepseek-ai/DeepSeek-V4.1-Flash-1017", task:"image-text-to-text", likes:3337, dl:105667 },
+    { id:"RecursiveSI/flint", task:"text-generation", likes:953, dl:10574 },
+    { id:"Nanbeige/Nanbeige4.3-33B", task:"text-generation", likes:649, dl:4785 },
+    { id:"XHToken/Spark-X2.6-4B", task:"text-generation", likes:776, dl:6191 },
+    { id:"black-forest-labs/flux-3-image-klein-comfy", task:"image-to-image", likes:1824, dl:750694 },
+    { id:"Lightricks/LTX-2.5", task:"image-to-video", likes:9546, dl:2163739 },
+    { id:"MiniMaxAI/MiniMax-M3.1-Flash", task:"image-text-to-text", likes:404, dl:11075 },
+    { id:"ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF", task:"text-generation", likes:384, dl:1105751 },
+    { id:"Qwen/Qwen3.8-27B", task:"image-text-to-text", likes:18520, dl:7522728 },
+    { id:"InternScience/Sage-A1.5", task:"text-generation", likes:329, dl:6613 },
+    { id:"abenzerps/Qwen-Image-2.1-Uncensored-Quantized", task:"text-to-image", likes:5170, dl:2201569 },
+    { id:"unsloth/flint-GGUF", task:"text-generation", likes:285, dl:149888 },
+    { id:"OpenMOSS-Team/MOSS-Image-SFT", task:"text-to-image", likes:774, dl:13253 },
+    { id:"orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF", task:"text-generation", likes:262, dl:13441 },
+    { id:"fishaudio/drama-3", task:"text-to-speech", likes:1053, dl:24996 },
+    { id:"Comfy-Org/Fibo-2.0", task:"image-to-image", likes:205, dl:170383 },
+    { id:"baidu/Unlimited-OCR-2", task:"image-text-to-text", likes:207, dl:513 },
+    { id:"KRAFTON/Raon-1-mini-preview", task:"text-generation", likes:206, dl:2208 },
+    { id:"nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-4GB", task:"text-generation", likes:173, dl:44651 },
+    { id:"google/embeddinggemma-2", task:"feature-extraction", likes:2963, dl:256852 }
+  ]
+};
+
+/* ═══════════════════ 状态 ═══════════════════ */
+
+const KEY = "hf-quest-v1";
+const ALL = LEVELS.flatMap(l => l.items);
+
+const S = {
+  done:{}, doneTs:{}, notes:{}, noteTs:{}, checkins:[], acts:{},
+  view:"today", filter:"all", base:"https://hf-mirror.com", open:{}
+};
+let liveState = { items:null, at:null, src:"未加载", loading:false };
+
+const CKEY = "hf-sync-v1";
+const CFG = { token:"", gistId:"", auto:true, lastAt:0, device:"" };
+let syncBusy = false, applying = false, syncTimer = null;
+const syncLogs = [];
+
+function load(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) Object.assign(S, JSON.parse(raw)); }catch(e){}
+  if(!Array.isArray(S.checkins)) S.checkins = [];
+  if(!S.acts) S.acts = {};
+  if(!S.open) S.open = {};
+  if(!S.doneTs) S.doneTs = {};
+  if(!S.noteTs) S.noteTs = {};
+}
+function saveRaw(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+  if(CFG.auto && CFG.token && CFG.gistId && !applying) scheduleSync();
+}
+function save(){ saveRaw(); }
+function loadCfg(){
+  try{ Object.assign(CFG, JSON.parse(localStorage.getItem(CKEY) || "{}")); }catch(e){}
+  if(!CFG.device) CFG.device = "DEV-" + Math.random().toString(36).slice(2,6).toUpperCase();
+  saveCfg();
+}
+function saveCfg(){ try{ localStorage.setItem(CKEY, JSON.stringify(CFG)); }catch(e){} }
+
+/* ── 日期 ── */
+const pad = n => String(n).padStart(2,"0");
+const fmt = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+function today(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+const TODAY = () => fmt(today());
+function dayNum(d){ return Math.floor(d.getTime()/86400000); }
+
+/* ── 派生统计 ── */
+function stats(){
+  const lessons = ALL.filter(i => S.done[i.id]).length;
+  const quests  = QUESTS.filter(q => S.done[q.id]).length;
+  const notes   = Object.values(S.notes).filter(v => v && v.trim()).length;
+  const lvlDone = LEVELS.filter(l => l.items.every(i => S.done[i.id])).length;
+  const xp = lessons*10 + quests*25 + lvlDone*50 + S.checkins.length*5;
+  return { lessons, quests, notes, lvlDone, xp,
+           total:ALL.length, pct: Math.round(lessons/ALL.length*100) };
+}
+function streak(){
+  const set = new Set(S.checkins);
+  let d = today();
+  if(!set.has(fmt(d))){
+    d.setDate(d.getDate()-1);
+    if(!set.has(fmt(d))) return 0;
+  }
+  let n = 0;
+  while(set.has(fmt(d))){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+function bestStreak(){
+  const days = [...new Set(S.checkins)].map(s => dayNum(new Date(s+"T00:00:00"))).sort((a,b)=>a-b);
+  let best = 0, cur = 0, prev = null;
+  for(const d of days){
+    cur = (prev !== null && d === prev+1) ? cur+1 : 1;
+    if(cur > best) best = cur;
+    prev = d;
+  }
+  return best;
+}
+function bump(delta){
+  const k = TODAY();
+  S.acts[k] = Math.max(0, (S.acts[k]||0) + delta);
+  if(S.acts[k] === 0) delete S.acts[k];
+}
+
+/* ═══════════════════ 工具 ═══════════════════ */
+function link(p){ return /^https?:/i.test(p) ? p : S.base + p; }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function num(n){ return n >= 1e6 ? (n/1e6).toFixed(1)+"M" : n >= 1e3 ? (n/1e3).toFixed(1)+"k" : String(n); }
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("on");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("on"), 1900);
+}
+
+/* ═══════════════════ 渲染：头部 ═══════════════════ */
+function renderHeader(){
+  const st = stats();
+  document.getElementById("hStreak").textContent = streak();
+  document.getElementById("hXp").textContent = st.xp;
+  document.getElementById("hDone").textContent = st.lessons;
+  document.getElementById("hPct").textContent = st.pct + "%";
+  document.getElementById("hRing").style.setProperty("--p", st.pct);
+}
+
+/* ═══════════════════ 渲染：今日 ═══════════════════ */
+function renderToday(){
+  const d = today();
+  const wd = ["周日","周一","周二","周三","周四","周五","周六"][d.getDay()];
+  document.getElementById("todayDate").textContent =
+    `${d.getFullYear()} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日 · ${wd}`;
+
+  const st = streak();
+  document.getElementById("bigStreak").textContent = st;
+  document.getElementById("bestStreak").textContent = bestStreak();
+  document.getElementById("totalDays").textContent = new Set(S.checkins).size;
+  document.getElementById("flame").className = "flame" + (st > 0 ? "" : " off");
+
+  const btn = document.getElementById("btnCheckin");
+  const checked = S.checkins.includes(TODAY());
+  btn.disabled = checked;
+  btn.textContent = checked ? "今日已打卡 ✓" : "今天打卡";
+
+  // 热力图：最近 12 周（对齐到周一）
+  const start = today();
+  start.setDate(start.getDate() - 83);
+  start.setDate(start.getDate() - ((start.getDay()+6)%7));
+  const heat = document.getElementById("heat");
+  const weeks = [];
+  let cur = new Date(start);
+  while(dayNum(cur) <= dayNum(today())){
+    const w = [];
+    for(let i=0;i<7;i++){ w.push(new Date(cur)); cur.setDate(cur.getDate()+1); }
+    weeks.push(w);
+  }
+  heat.innerHTML = weeks.map(w => "<div class='wk'>" + w.map(dd => {
+    const k = fmt(dd), future = dayNum(dd) > dayNum(today());
+    const n = (S.checkins.includes(k) ? 1 : 0) + (S.acts[k] || 0);
+    const lv = n >= 5 ? 3 : n >= 3 ? 2 : n >= 1 ? 1 : 0;
+    return `<i class="l${lv}${k === TODAY() ? " today" : ""}${future ? " future" : ""}" title="${k}${n ? " · " + n + " 个动作" : ""}"></i>`;
+  }).join("") + "</div>").join("");
+
+  // 今日微任务
+  const mi = dayNum(d) % MICRO.length;
+  document.getElementById("micro").innerHTML =
+    `<div style="padding:14px;border-radius:11px;background:rgba(255,210,30,.07);border:1px solid rgba(255,210,30,.22)">
+       <span class="badge" style="border-color:rgba(255,210,30,.3);color:var(--acc)">DAY ${mi+1}/12</span>
+       <p style="margin:9px 0 0">${esc(MICRO[mi])}</p>
+     </div>`;
+
+  // 下一课
+  const next = ALL.find(i => !S.done[i.id]);
+  document.getElementById("nextUp").innerHTML = next
+    ? `<div style="display:flex;gap:10px;align-items:center">
+         <div style="flex:1"><div style="font-size:14px;font-weight:500">${esc(next.t)}</div>
+         <div style="font-size:12px;color:var(--dim2)">${esc(next.d.split("。")[0])}</div></div>
+         <button class="btn sm primary" data-act="goto" data-id="${next.id}">去做</button>
+       </div>`
+    : `<div style="color:var(--ok);font-size:14px">🎉 42 课全部完成，去「探索任务」收尾吧。</div>`;
+}
+
+/* ═══════════════════ 渲染：学习路径 ═══════════════════ */
+function renderPath(){
+  const q = (document.getElementById("q").value || "").toLowerCase().trim();
+  const f = S.filter;
+  const box = document.getElementById("pathList");
+  let html = "", shown = 0;
+
+  for(const lv of LEVELS){
+    const doneN = lv.items.filter(i => S.done[i.id]).length;
+    const pct = Math.round(doneN/lv.items.length*100);
+    const isOpen = !!S.open[lv.id];
+
+    const items = lv.items.filter(i => {
+      if(f === "todo" && S.done[i.id]) return false;
+      if(f === "done" && !S.done[i.id]) return false;
+      if(q && !(i.t + i.d + lv.name).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    if(!items.length) continue;
+    shown += items.length;
+
+    html += `<div class="lvl ${isOpen ? "open" : ""}" data-lvl="${lv.id}">
+      <div class="head" data-act="lvl" data-lvl="${lv.id}">
+        <span class="dot" style="background:${lv.color}"></span>
+        <span class="t">${esc(lv.name)}</span>
+        <span class="cnt">${doneN}/${lv.items.length}</span>
+        <div class="bar"><i style="width:${pct}%"></i></div>
+        <span class="caret">▶</span>
+      </div>
+      <div class="items">`;
+
+    for(const it of items){
+      const on = !!S.done[it.id];
+      html += `<div class="item ${on ? "done" : ""}">
+        <button class="ck" role="checkbox" aria-checked="${on}" data-act="lesson" data-id="${it.id}" aria-label="标记完成"></button>
+        <div class="body">
+          <div class="t">${esc(it.t)}<a class="lnk" href="${link(it.l)}" target="_blank" rel="noopener">文档 ↗</a></div>
+          <div class="d">${esc(it.d)}</div>
+          <input class="note" type="text" data-note="${it.id}" placeholder="一句话笔记：这课我学到了…"
+                 value="${esc(S.notes[it.id] || "")}">
+        </div>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  box.innerHTML = shown ? html : `<div class="empty">没有匹配的课程</div>`;
+}
+
+/* ═══════════════════ 渲染：探索任务 ═══════════════════ */
+function renderQuests(){
+  const doneN = QUESTS.filter(q => S.done[q.id]).length;
+  document.getElementById("qList").innerHTML = QUESTS.map(q => {
+    const on = !!S.done[q.id];
+    return `<div class="q ${on ? "done" : ""}">
+      <button class="ck" role="checkbox" aria-checked="${on}" data-act="quest" data-id="${q.id}" aria-label="标记完成"></button>
+      <div class="body">
+        <div class="t">${esc(q.t)}</div>
+        <div class="d">${esc(q.d)}</div>
+        <span class="tag">${q.tag}</span>
+      </div>
+    </div>`;
+  }).join("") + `<div style="grid-column:1/-1;font-size:12.5px;color:var(--dim2)">
+      已完成 ${doneN}/12 ${doneN === 12 ? "· 🏅 全探完成" : ""}</div>`;
+}
+
+/* ═══════════════════ 渲染：实时榜 ═══════════════════ */
+function renderLive(){
+  const body = document.getElementById("liveBody");
+  const meta = document.getElementById("liveSrc");
+  meta.textContent = liveState.src;
+
+  if(liveState.loading){
+    body.innerHTML = `<div class="empty">正在从 ${esc(S.base)} 拉取…</div>`;
+    return;
+  }
+  const items = liveState.items;
+  if(!items){
+    body.innerHTML = `<div class="empty">还没加载。点上面的「拉取实时榜」。</div>`;
+    document.getElementById("liveMeta").textContent = "点「拉取」从镜像 API 取实时数据；失败则用内置快照。";
+    return;
+  }
+  document.getElementById("liveMeta").textContent =
+    `来源 ${S.base} · 时间 ${liveState.at}` + (liveState.err ? " · ⚠️ 实时失败，以下为离线快照" : "");
+
+  body.innerHTML = `<table>
+    <thead><tr><th style="width:34px">#</th><th>模型</th><th>任务</th>
+    <th style="text-align:right">likes</th><th style="text-align:right">下载</th></tr></thead>
+    <tbody>${items.map((m,i) => `<tr>
+      <td class="num">${i+1}</td>
+      <td class="id"><a href="${S.base}/${m.id}" target="_blank" rel="noopener">${esc(m.id)}</a></td>
+      <td><span class="badge">${esc(m.task || "-")}</span></td>
+      <td class="num">${num(m.likes)}</td>
+      <td class="num">${num(m.dl)}</td>
+    </tr>`).join("")}</tbody></table>`;
+}
+
+async function fetchLive(){
+  liveState = { items:null, at:null, src:"拉取中…", loading:true };
+  renderLive();
+  try{
+    const c = new AbortController();
+    const t = setTimeout(() => c.abort(), 12000);
+    const r = await fetch(S.base + "/api/models?sort=trendingScore&direction=-1&limit=20", { signal:c.signal });
+    clearTimeout(t);
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    if(!Array.isArray(j) || !j.length) throw new Error("empty");
+    liveState = {
+      items: j.map(x => ({ id:x.id, task:x.pipeline_tag, likes:x.likes||0, dl:x.downloads||0 })),
+      at: new Date().toLocaleString("zh-CN"),
+      src: "实时", loading:false, err:false
+    };
+    toast("已拉取 " + j.length + " 条实时数据");
+  }catch(e){
+    liveState = {
+      items: SNAPSHOT.items, at: SNAPSHOT.date,
+      src: "离线快照", loading:false, err:true
+    };
+    toast("实时拉取失败，已用离线快照");
+  }
+  renderLive();
+}
+
+/* ═══════════════════ 渲染：统计与徽章 ═══════════════════ */
+const BADGES = [
+  { ic:"🌱", n:"启程",     d:"完成第一次打卡",        f:s => S.checkins.length >= 1 },
+  { ic:"🔥", n:"三日不断", d:"连续打卡 3 天",          f:() => streak() >= 3 || bestStreak() >= 3 },
+  { ic:"🔥", n:"七日之火", d:"连续打卡 7 天",          f:() => streak() >= 7 || bestStreak() >= 7 },
+  { ic:"💪", n:"21 天习惯", d:"连续打卡 21 天",        f:() => streak() >= 21 || bestStreak() >= 21 },
+  { ic:"🗓️", n:"双月坚持", d:"连续打卡 60 天",         f:() => streak() >= 60 || bestStreak() >= 60 },
+  { ic:"🧭", n:"认路了",   d:"完成 L0 全部课程",        f:s => LEVELS[0].items.every(i => S.done[i.id]) },
+  { ic:"⚙️", n:"跑起来了", d:"完成 L1 全部课程",        f:s => LEVELS[1].items.every(i => S.done[i.id]) },
+  { ic:"🔤", n:"懂词表了", d:"完成 L2 全部课程",        f:s => LEVELS[2].items.every(i => S.done[i.id]) },
+  { ic:"🎯", n:"会微调了", d:"完成 L3 全部课程",        f:s => LEVELS[3].items.every(i => S.done[i.id]) },
+  { ic:"🚀", n:"能部署了", d:"完成 L4 全部课程",        f:s => LEVELS[4].items.every(i => S.done[i.id]) },
+  { ic:"🏛️", n:"有作品了", d:"完成 L5 全部课程",        f:s => LEVELS[5].items.every(i => S.done[i.id]) },
+  { ic:"📚", n:"十课",     d:"完成 10 课",              f:s => s.lessons >= 10 },
+  { ic:"📖", n:"半程",     d:"完成 21 课",              f:s => s.lessons >= 21 },
+  { ic:"🏆", n:"通关",     d:"42 课全部完成",           f:s => s.lessons >= 42 },
+  { ic:"🔍", n:"探索者",   d:"完成 5 个探索任务",       f:s => s.quests >= 5 },
+  { ic:"🧪", n:"全探",     d:"12 个探索任务全完成",     f:s => s.quests >= 12 },
+  { ic:"✍️", n:"笔记家",   d:"写了 5 条笔记",           f:s => s.notes >= 5 },
+  { ic:"⚡", n:"千 XP",    d:"累计 1000 XP",            f:s => s.xp >= 1000 }
+];
+
+function renderStats(){
+  const st = stats();
+  document.getElementById("sXp").textContent = st.xp;
+  document.getElementById("sLessons").textContent = st.lessons;
+  document.getElementById("sQuests").textContent = st.quests;
+  document.getElementById("sNotes").textContent = st.notes;
+
+  document.getElementById("skills").innerHTML = LEVELS.map(lv => {
+    const n = lv.items.filter(i => S.done[i.id]).length;
+    const pct = Math.round(n/lv.items.length*100);
+    return `<div class="skill">
+      <div class="row"><span>${esc(lv.name)}</span><span>${n}/${lv.items.length} · ${pct}%</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div>`;
+  }).join("");
+
+  const got = BADGES.filter(b => b.f(st)).length;
+  document.getElementById("badgeCount").textContent = `（已获 ${got}/${BADGES.length}）`;
+  document.getElementById("badges").innerHTML = BADGES.map(b => {
+    const on = b.f(st);
+    return `<div class="bg-item ${on ? "on" : ""}">
+      <span class="ic">${b.ic}</span>
+      <div><div class="n">${esc(b.n)}</div><div class="d">${esc(b.d)}</div></div>
+    </div>`;
+  }).join("");
+
+  const recent = [...S.checkins].sort().slice(-14).reverse();
+  document.getElementById("history").innerHTML = recent.length
+    ? `<div class="sub" style="margin:14px 0 8px">最近打卡</div>
+       <div style="display:flex;flex-wrap:wrap;gap:7px">${recent.map(d => {
+         const n = (S.acts[d]||0);
+         return `<span class="badge" style="border-color:var(--line2)">${d}${n ? " · " + n + " 动作" : ""}</span>`;
+       }).join("")}</div>`
+    : `<div class="sub" style="margin-top:14px">还没有打卡记录。</div>`;
+}
+
+/* ═══════════════════ 云同步（私有 Gist） ═══════════════════ */
+
+function dataSnap(){
+  return { done:S.done, doneTs:S.doneTs, notes:S.notes, noteTs:S.noteTs,
+           checkins:S.checkins, acts:S.acts };
+}
+
+/* 合并：勾选/笔记按时间戳取胜，打卡取并集，动作数取较大值 */
+function mergeData(a, b){
+  a = a || {}; b = b || {};
+  const out = { done:{}, doneTs:{}, notes:{}, noteTs:{}, checkins:[], acts:{} };
+  const aD = a.done||{}, bD = b.done||{}, aT = a.doneTs||{}, bT = b.doneTs||{};
+
+  new Set([...Object.keys(aD), ...Object.keys(bD)]).forEach(id => {
+    const inA = id in aD, inB = id in bD;
+    const ta = aT[id]||0, tb = bT[id]||0;
+    let v, t;
+    if(inA && inB){ v = ta >= tb ? aD[id] : bD[id]; t = Math.max(ta, tb); }
+    else if(inA){ v = aD[id]; t = ta || 1; }
+    else { v = bD[id]; t = tb || 1; }
+    out.done[id] = v === true;
+    out.doneTs[id] = t;
+  });
+
+  const aN = a.notes||{}, bN = b.notes||{}, aNT = a.noteTs||{}, bNT = b.noteTs||{};
+  new Set([...Object.keys(aN), ...Object.keys(bN)]).forEach(id => {
+    const inA = id in aN, inB = id in bN;
+    const ta = aNT[id]||0, tb = bNT[id]||0;
+    let v, t;
+    if(inA && inB){ v = ta >= tb ? aN[id] : bN[id]; t = Math.max(ta, tb); }
+    else if(inA){ v = aN[id]; t = ta || 1; }
+    else { v = bN[id]; t = tb || 1; }
+    out.notes[id] = v;
+    out.noteTs[id] = t;
+  });
+
+  out.checkins = [...new Set([...(a.checkins||[]), ...(b.checkins||[])])].sort();
+  new Set([...Object.keys(a.acts||{}), ...Object.keys(b.acts||{})]).forEach(k => {
+    out.acts[k] = Math.max((a.acts||{})[k]||0, (b.acts||{})[k]||0);
+  });
+  return out;
+}
+
+function logSync(msg, bad){
+  syncLogs.unshift({ t:new Date().toLocaleTimeString("zh-CN"), msg, bad:!!bad });
+  if(syncLogs.length > 6) syncLogs.length = 6;
+  renderSync();
+}
+
+async function ghApi(path, opts){
+  opts = opts || {};
+  const r = await fetch("https://api.github.com" + path, {
+    method: opts.method || "GET",
+    headers: Object.assign({
+      "Authorization": "Bearer " + CFG.token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }, opts.body ? { "Content-Type":"application/json" } : {}),
+    body: opts.body
+  });
+  if(!r.ok){
+    let m = "HTTP " + r.status;
+    try{ const j = await r.json(); if(j && j.message) m = j.message + " (" + r.status + ")"; }catch(e){}
+    throw new Error(m);
+  }
+  return r.json();
+}
+
+function payload(){ return { v:1, updatedAt:new Date().toISOString(), device:CFG.device, data:dataSnap() }; }
+
+async function createGist(){
+  if(!CFG.token) return toast("先保存 token");
+  syncBusy = true; renderSync();
+  try{
+    const j = await ghApi("/gists", { method:"POST", body: JSON.stringify({
+      description:"HF 探索打卡 · 云存档",
+      public:false,
+      files:{ "hf-quest.json":{ content: JSON.stringify(payload(), null, 2) } }
+    })});
+    CFG.gistId = j.id; CFG.lastAt = Date.now(); saveCfg();
+    logSync("已创建存档 " + j.id);
+    toast("云存档已创建");
+  }catch(e){
+    logSync("创建失败：" + e.message, true);
+    toast("创建失败：" + e.message);
+  }finally{ syncBusy = false; render(); }
+}
+
+async function pullRemote(){
+  const j = await ghApi("/gists/" + CFG.gistId);
+  const f = j.files && j.files["hf-quest.json"];
+  if(!f) return null;
+  let content = f.content;
+  if(f.truncated && f.raw_url) content = await (await fetch(f.raw_url)).text();
+  const p = JSON.parse(content);
+  return (p && p.data) ? p.data : p;
+}
+
+async function pushRemote(d){
+  await ghApi("/gists/" + CFG.gistId, { method:"PATCH", body: JSON.stringify({
+    files:{ "hf-quest.json":{ content: JSON.stringify(
+      { v:1, updatedAt:new Date().toISOString(), device:CFG.device, data:d }, null, 2) } }
+  })});
+}
+
+async function syncNow(o){
+  o = o || {};
+  if(!CFG.token || !CFG.gistId){ if(!o.silent) toast("先保存 token 和 Gist ID"); return; }
+  if(syncBusy) return;
+  syncBusy = true; renderSync();
+  try{
+    const remote = await pullRemote();
+    const merged = remote ? mergeData(dataSnap(), remote) : dataSnap();
+    applying = true;
+    S.done = merged.done; S.doneTs = merged.doneTs;
+    S.notes = merged.notes; S.noteTs = merged.noteTs;
+    S.checkins = merged.checkins; S.acts = merged.acts;
+    saveRaw(); applying = false;
+    await pushRemote(merged);
+    CFG.lastAt = Date.now(); saveCfg();
+    logSync(remote ? "双向同步完成" : "存档为空，已上传本机进度");
+    if(!o.silent) toast("已同步");
+    render();
+  }catch(e){
+    applying = false;
+    logSync("同步失败：" + e.message, true);
+    if(!o.silent) toast("同步失败：" + e.message);
+  }finally{ syncBusy = false; renderSync(); }
+}
+
+function scheduleSync(){
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => syncNow({ silent:true }), 4000);
+}
+
+function renderSync(){
+  const box = document.getElementById("syncState");
+  if(!box) return;
+  const ok = !!(CFG.token && CFG.gistId);
+  const last = CFG.lastAt ? new Date(CFG.lastAt).toLocaleString("zh-CN") : "从未";
+  box.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <span class="badge" style="border-color:${syncBusy ? "var(--acc)" : ok ? "var(--ok)" : "var(--line2)"};
+      color:${syncBusy ? "var(--acc)" : ok ? "var(--ok)" : "var(--dim)"}">
+      ${syncBusy ? "同步中…" : ok ? "已接通" : "未配置"}</span>
+    <span class="badge">最近同步：${esc(last)}</span>
+    ${CFG.gistId ? `<a class="badge" href="https://gist.github.com/${esc(CFG.gistId)}" target="_blank" rel="noopener">打开 Gist ↗</a>` : ""}
+    ${CFG.token ? `<span class="badge">token 已保存 ····${esc(CFG.token.slice(-4))}</span>` : ""}
+  </div>`;
+
+  const ti = document.getElementById("tokenIn");
+  if(ti && document.activeElement !== ti) ti.value = "";
+  const gi = document.getElementById("gistIn");
+  if(gi && document.activeElement !== gi) gi.value = CFG.gistId || "";
+  const ac = document.getElementById("autoChk");
+  if(ac) ac.checked = !!CFG.auto;
+  const dn = document.getElementById("devName");
+  if(dn) dn.textContent = "本机 " + CFG.device;
+
+  document.getElementById("syncLog").innerHTML = syncLogs.length
+    ? syncLogs.map(l => `<div style="font-size:12.5px;font-family:var(--mono);color:${l.bad ? "var(--rose)" : "var(--dim2)"}">${l.t} · ${esc(l.msg)}</div>`).join("")
+    : `<div style="font-size:12.5px;color:var(--dim2)">还没有同步记录。</div>`;
+}
+
+/* ═══════════════════ 总渲染 ═══════════════════ */
+function render(){
+  renderHeader(); renderToday(); renderPath(); renderQuests(); renderStats(); renderSync();
+  if(S.view === "live") renderLive();
+  document.querySelectorAll(".tab").forEach(b =>
+    b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
+  document.querySelectorAll("section[id^='v-']").forEach(s =>
+    s.classList.toggle("hide", s.id !== "v-" + S.view));
+  const sel = document.getElementById("baseSel");
+  if(sel) sel.value = S.base;
+}
+
+/* ═══════════════════ 事件 ═══════════════════ */
+document.addEventListener("click", async e => {
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act;
+
+  if(act === "tab"){
+    S.view = el.dataset.view; save(); render();
+    if(S.view === "live" && !liveState.items && !liveState.loading) fetchLive();
+    window.scrollTo({ top:0, behavior:"smooth" });
+    return;
+  }
+
+  if(act === "checkin"){
+    const k = TODAY();
+    if(S.checkins.includes(k)) return;
+    S.checkins.push(k); save(); render();
+    const s = streak();
+    toast(s > 1 ? `打卡成功 · 连续 ${s} 天 🔥` : "打卡成功 🌱");
+    // 达成里程碑
+    if([3,7,21,60,100].includes(s)) setTimeout(() => toast(`里程碑：连续 ${s} 天！`), 2000);
+    return;
+  }
+
+  if(act === "lesson"){
+    const id = el.dataset.id;
+    const on = !S.done[id];
+    S.done[id] = on;
+    S.doneTs[id] = Date.now();
+    bump(on ? 1 : -1);
+    save(); render();
+    if(on){
+      const lv = LEVELS.find(l => l.items.some(i => i.id === id));
+      if(lv && lv.items.every(i => S.done[i.id])) toast(`🎉 ${lv.name} 全部完成！+50 XP`);
+      else toast("+10 XP");
+    }
+    return;
+  }
+
+  if(act === "quest"){
+    const id = el.dataset.id;
+    const on = !S.done[id];
+    S.done[id] = on;
+    S.doneTs[id] = Date.now();
+    bump(on ? 1 : -1);
+    save(); render();
+    if(on) toast("+25 XP");
+    return;
+  }
+
+  if(act === "lvl"){
+    const id = el.dataset.lvl;
+    const cur = !!S.open[id];
+    S.open[id] = !cur; save(); renderPath();
+    const node = document.querySelector(`[data-lvl="${id}"]`);
+    if(node) node.classList.toggle("open", !cur);
+    return;
+  }
+
+  if(act === "expand"){ LEVELS.forEach(l => S.open[l.id] = true); save(); renderPath(); return; }
+  if(act === "collapse"){ LEVELS.forEach(l => S.open[l.id] = false); save(); renderPath(); return; }
+
+  if(act === "filter"){
+    S.filter = el.dataset.f; save();
+    document.querySelectorAll("#filter button").forEach(b =>
+      b.setAttribute("aria-pressed", String(b.dataset.f === S.filter)));
+    renderPath();
+    return;
+  }
+
+  if(act === "goto"){
+    S.view = "path";
+    S.open = {}; LEVELS.forEach(l => S.open[l.id] = true);
+    const id = el.dataset.id;
+    const lv = LEVELS.find(l => l.items.some(i => i.id === id));
+    if(lv) S.open[lv.id] = true;
+    save(); render();
+    setTimeout(() => {
+      const node = [...document.querySelectorAll(".item")].find(n =>
+        n.querySelector(`[data-act="lesson"][data-id="${id}"]`));
+      if(node){
+        node.scrollIntoView({ behavior:"smooth", block:"center" });
+        node.style.outline = "1px solid var(--acc)";
+        setTimeout(() => node.style.outline = "", 2200);
+      }
+    }, 120);
+    return;
+  }
+
+  if(act === "fetch"){ await fetchLive(); return; }
+
+  /* ── 云同步 ── */
+  if(act === "save-token"){
+    const v = (document.getElementById("tokenIn").value || "").trim();
+    if(!v) return toast("先粘贴 token");
+    if(v.length < 20) return toast("这不像一个 GitHub token");
+    CFG.token = v; saveCfg(); render(); toast("token 已保存在本机");
+    return;
+  }
+  if(act === "clear-token"){
+    CFG.token = ""; saveCfg(); render(); toast("token 已清除");
+    return;
+  }
+  if(act === "save-gist"){
+    let v = (document.getElementById("gistIn").value || "").trim();
+    const m = v.match(/([0-9a-f]{20,})/i);
+    if(m) v = m[1];
+    if(!v) return toast("先填 Gist ID");
+    CFG.gistId = v; saveCfg(); render(); toast("Gist ID 已保存");
+    return;
+  }
+  if(act === "create-gist"){ await createGist(); return; }
+  if(act === "sync"){ await syncNow(); return; }
+
+  if(act === "export"){
+    const data = JSON.stringify({ ...S, _exported:new Date().toISOString() }, null, 2);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([data], { type:"application/json" }));
+    a.download = "hf-quest-" + TODAY() + ".json";
+    a.click(); URL.revokeObjectURL(a.href);
+    toast("已导出");
+    return;
+  }
+
+  if(act === "import"){ document.getElementById("fileIn").click(); return; }
+
+  if(act === "reset"){
+    if(confirm("确定清空所有打卡、进度和笔记？这个操作不可撤销。")){
+      localStorage.removeItem(KEY);
+      S.done = {}; S.notes = {}; S.checkins = []; S.acts = {}; S.open = {};
+      save(); render(); toast("已清空");
+    }
+    return;
+  }
+});
+
+/* 笔记：不重渲染，避免光标丢失 */
+document.addEventListener("input", e => {
+  const t = e.target;
+  if(t.matches("[data-note]")){
+    const id = t.dataset.note;
+    S.notes[id] = t.value.trim() ? t.value : "";
+    S.noteTs[id] = Date.now();
+    clearTimeout(window.__nt);
+    window.__nt = setTimeout(save, 400);
+  }
+});
+
+/* 搜索：只重渲染列表 */
+document.addEventListener("input", e => {
+  if(e.target.id === "q") renderPath();
+});
+
+document.getElementById("fileIn").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const j = JSON.parse(rd.result);
+      Object.assign(S, {
+        done: j.done || {}, notes: j.notes || {}, checkins: j.checkins || [],
+        acts: j.acts || {}, base: j.base || S.base, open: j.open || {}
+      });
+      save(); render(); toast("导入成功");
+    }catch(err){ alert("文件格式不对：" + err.message); }
+  };
+  rd.readAsText(f);
+  e.target.value = "";
+});
+
+document.getElementById("baseSel").addEventListener("change", e => {
+  S.base = e.target.value; save(); render(); toast("链接站已切换为 " + S.base);
+});
+
+document.addEventListener("change", e => {
+  if(e.target.id === "autoChk"){
+    CFG.auto = e.target.checked; saveCfg();
+    toast(CFG.auto ? "已开启自动同步" : "已关闭自动同步");
+    if(CFG.auto && CFG.token && CFG.gistId) scheduleSync();
+  }
+});
+
+/* 快捷键 */
+document.addEventListener("keydown", e => {
+  if(e.key === "/" && document.activeElement.tagName !== "INPUT"){
+    e.preventDefault();
+    S.view = "path"; render();
+    document.getElementById("q").focus();
+  }
+  if(e.key === "Escape" && document.activeElement.tagName === "INPUT"){
+    document.activeElement.blur();
+  }
+});
+
+/* 启动 */
+loadCfg();
+load();
+if(!Object.keys(S.open).length){
+  // 首次使用：只展开第一个还没做完的阶段，避免一屏 42 课
+  const first = LEVELS.find(l => l.items.some(i => !S.done[i.id])) || LEVELS[0];
+  LEVELS.forEach(l => S.open[l.id] = (l === first));
+  saveRaw();
+}
+render();
+if(CFG.auto && CFG.token && CFG.gistId) syncNow({ silent:true });
+</script>
+</body>
+</html>
