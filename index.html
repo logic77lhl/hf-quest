@@ -510,11 +510,11 @@ const LEVELS = [
     items:[
       { id:"l5-1", t:"用 CLI 上传模型", d:"huggingface-cli login + upload_folder。验证：你的仓库有正确的 Files 列表。", l:"/docs/huggingface_hub/guides/upload" },
       { id:"l5-2", t:"写规范的 model card", d:"YAML front-matter：license / language / base_model / tags / library_name。验证：页面右侧出现正确的元信息，可被过滤搜到。", l:"/docs/hub/model-cards" },
-      { id:"l5-3", t:"加上 eval-results", d:"把评测指标写进 metadata。验证：模型卡里出现可读的指标块。", l:"/docs/hub/model-card-metadata" },
-      { id:"l5-4", t:"分支、tag 与 revision", d:"用 revision 固定版本，别用 main。验证：两次调用指定不同 revision，拿到不同权重。", l:"/docs/hub/repository-settings" },
+      { id:"l5-3", t:"加上 eval-results", d:"把评测指标写进 metadata。验证：模型卡里出现可读的指标块。", l:"/docs/hub/model-cards#model-card-metadata" },
+      { id:"l5-4", t:"分支、tag 与 revision", d:"用 revision 固定版本，别用 main。验证：两次调用指定不同 revision，拿到不同权重。", l:"/docs/hub/repositories-settings" },
       { id:"l5-5", t:"Token 类型与权限", d:"read / write / fine-grained。验证：为 CI 单独建一个只读 token，并解释为什么不能给 write。", l:"/settings/tokens" },
       { id:"l5-6", t:"复现一篇 Daily Paper", d:"从 /papers 挑一篇有模型的。验证：跑通它的 demo，写 3 行「它解决什么 + 我用在哪」。", l:"/papers" },
-      { id:"l5-7", t:"参与社区", d:"在 Discussions 回答问题、或给一个仓库提 PR。验证：拿到一个真实的回复或 merge。", l:"/docs/hub/community" },
+      { id:"l5-7", t:"参与社区", d:"在 Discussions 回答问题、或给一个仓库提 PR。验证：拿到一个真实的回复或 merge。", l:"/docs/hub/repositories-pull-requests-discussions" },
       { id:"l5-8", t:"搭一个作品集", d:"3 个 Space + 1 个自己微调的模型 + 完整卡片。验证：把链接发给一个外行，他能看懂你在做什么。", l:"/spaces" }
     ]}
 ];
