@@ -173,6 +173,20 @@ tr:hover td{background:rgba(23,32,45,.6)}
 
 /* ── misc ── */
 .empty{color:var(--dim2);font-size:13px;padding:20px;text-align:center}
+
+/* ── modal / sync rows ── */
+.modal{position:fixed;inset:0;background:rgba(4,7,12,.74);backdrop-filter:blur(5px);
+  display:none;place-items:center;z-index:80;padding:20px}
+.modal.on{display:grid}
+.modal .box{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line2);
+  border-radius:16px;max-width:680px;width:100%;max-height:84vh;overflow:auto;padding:22px;
+  box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.mrow{border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:10px;
+  font-size:13.5px;background:var(--bg2)}
+.mrow.ok{border-color:rgba(52,211,153,.32)}
+.mrow.warn{border-color:rgba(245,158,11,.38);background:linear-gradient(180deg,rgba(245,158,11,.07),var(--bg2))}
+.mrow.bad{border-color:rgba(251,113,133,.42);background:linear-gradient(180deg,rgba(251,113,133,.08),var(--bg2))}
+.pill[data-state]{cursor:pointer}
 kbd{font:11px var(--mono);background:var(--panel2);border:1px solid var(--line2);border-bottom-width:2px;
   border-radius:5px;padding:2px 5px;color:var(--dim)}
 footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim2);font-size:12px}
@@ -197,6 +211,7 @@ footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);color:v
       <span class="pill" title="经验值">⚡ <b id="hXp">0</b> XP</span>
       <span class="pill" title="课程完成度"><b id="hDone">0</b>/42</span>
       <div class="ring" id="hRing" title="总进度"><span id="hPct">0%</span></div>
+      <span class="pill" id="syncPill" style="display:none" data-act="opensync" title="跨设备同步状态"></span>
     </div>
     <nav class="tabs" id="tabs">
       <button class="tab" data-act="tab" data-view="today" aria-selected="true">今日打卡</button>
@@ -373,7 +388,8 @@ $env:HF_HOME="D:\dev_cache\huggingface"</pre>
           <p style="margin:0 0 10px"><b style="color:var(--tx)">③ 第二台电脑</b><br>
           打开同一个网址 → 粘同一个 token + 同一个 Gist ID → 点「立即双向同步」。以后开页面自动拉、改完自动推。</p>
           <p style="margin:0"><b style="color:var(--tx)">合并规则</b><br>
-          课程勾选 / 笔记：按最后修改时间取胜（所以取消勾选也能同步）；打卡日期：取并集；每日动作数：取较大值。永远不丢你本机已有的进度。</p>
+          课程勾选 / 笔记：按最后修改时间取胜（所以取消勾选也能同步）；打卡日期取并集；动作数取较大值。<br>
+          但有两种情况<b style="color:var(--tx)">不会自动落笔</b>：两边都改过同一个项目（冲突），或云端会取消你本地的完成项。这两种都会先弹预览，让你裁决，再推送。</p>
         </div>
       </div>
       <p class="sub" style="margin:16px 0 0;color:#f59e0b">
@@ -427,6 +443,7 @@ $env:HF_HOME="D:\dev_cache\huggingface"</pre>
   </footer>
 </main>
 
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
 <input type="file" id="fileIn" accept=".json" class="hide">
 <div class="toast" id="toast"></div>
 
@@ -599,9 +616,14 @@ function load(){
   if(!S.doneTs) S.doneTs = {};
   if(!S.noteTs) S.noteTs = {};
 }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 function saveRaw(){
-  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
-  if(CFG.auto && CFG.token && CFG.gistId && !applying) scheduleSync();
+  persist();
+  if(!applying && CFG.auto && CFG.token && CFG.gistId){
+    if(CFG.pending !== "conflict") setPending("dirty");
+    scheduleSync();
+    renderHeader();
+  }
 }
 function save(){ saveRaw(); }
 function loadCfg(){
@@ -674,6 +696,21 @@ function renderHeader(){
   document.getElementById("hDone").textContent = st.lessons;
   document.getElementById("hPct").textContent = st.pct + "%";
   document.getElementById("hRing").style.setProperty("--p", st.pct);
+
+  const pill = document.getElementById("syncPill");
+  if(pill){
+    const s = syncStateText();
+    if(!s.k){ pill.style.display = "none"; }
+    else{
+      pill.style.display = "";
+      pill.dataset.state = s.k;
+      pill.style.borderColor = s.color === "var(--ok)" ? "rgba(52,211,153,.4)"
+                            : s.color === "var(--rose)" ? "rgba(251,113,133,.45)" : "rgba(255,210,30,.35)";
+      pill.style.color = s.color;
+      pill.innerHTML = (s.k === "conflict" ? "⚠️ " : s.k === "error" ? "⛔ " : s.k === "dirty" ? "⏳ " : "✅ ")
+                     + esc(s.label);
+    }
+  }
 }
 
 /* ═══════════════════ 渲染：今日 ═══════════════════ */
@@ -914,16 +951,67 @@ function renderStats(){
     : `<div class="sub" style="margin-top:14px">还没有打卡记录。</div>`;
 }
 
-/* ═══════════════════ 云同步（私有 Gist） ═══════════════════ */
+/* ═══════════════════ 云同步（私有 Gist · v2） ═══════════════════
+   可靠性设计（GitHub Gist 不支持 If-Match 条件写，实测 400）：
+   1) 写前复查 rev：pull → 若云端 rev 变了则放弃本次写入、重新合并（最多 3 轮）
+   2) pending 状态机：dirty / conflict / error / ""，写进 localStorage，刷新不丢
+   3) 冲突不再静默：两边都在上次同步后改过同一个 key → 必须人工裁决
+   4) 每个版本带 rev + parent，配合 Gist 历史可回滚（非破坏性恢复）
+   5) 用 GitHub 响应的 Date 头校正本机时钟偏移，时间戳不再被坏时钟带偏
+*/
+
+const API = "https://api.github.com";
+const TITLE = {};
+ALL.forEach(i => TITLE[i.id] = i.t);
+QUESTS.forEach(q => TITLE[q.id] = q.t);
+
+function nowTs(){ return Date.now() + (CFG.offset || 0); }
+function updateClock(serverMs){
+  const off = Math.round(serverMs - Date.now());
+  if(Math.abs(off) > 5000){ CFG.offset = off; saveCfg(); }
+}
+function setPending(v){ CFG.pending = v || ""; saveCfg(); }
 
 function dataSnap(){
   return { done:S.done, doneTs:S.doneTs, notes:S.notes, noteTs:S.noteTs,
            checkins:S.checkins, acts:S.acts };
 }
+function applyData(d){
+  S.done = d.done || {}; S.doneTs = d.doneTs || {};
+  S.notes = d.notes || {}; S.noteTs = d.noteTs || {};
+  S.checkins = (d.checkins || []).slice().sort(); S.acts = d.acts || {};
+}
 
-/* 合并：勾选/笔记按时间戳取胜，打卡取并集，动作数取较大值 */
-function mergeData(a, b){
-  a = a || {}; b = b || {};
+async function api(path, opts){
+  opts = opts || {};
+  const headers = {
+    "Authorization": "Bearer " + CFG.token,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28"
+  };
+  if(opts.body) headers["Content-Type"] = "application/json";
+  const r = await fetch(API + path, { method: opts.method || "GET", headers, body: opts.body });
+  const dt = r.headers.get("date");
+  if(dt){ const s = Date.parse(dt); if(!isNaN(s)) updateClock(s); }
+  const txt = await r.text();
+  let j = null;
+  try{ j = txt ? JSON.parse(txt) : null; }catch(e){}
+  if(!r.ok){
+    const e = new Error(((j && j.message) || ("HTTP " + r.status)) + " · " + r.status);
+    e.status = r.status;
+    throw e;
+  }
+  return { json:j, etag:r.headers.get("etag"), status:r.status };
+}
+
+function makePayload(d, rev, parent){
+  return { v:2, rev:rev, parent:parent, device:CFG.device,
+           updatedAt:new Date(nowTs()).toISOString(), data:d };
+}
+
+/* ── 合并：choices[id] = 'local' | 'remote' 可强制裁决 ── */
+function mergeData(a, b, choices){
+  a = a || {}; b = b || {}; choices = choices || {};
   const out = { done:{}, doneTs:{}, notes:{}, noteTs:{}, checkins:[], acts:{} };
   const aD = a.done||{}, bD = b.done||{}, aT = a.doneTs||{}, bT = b.doneTs||{};
 
@@ -931,7 +1019,11 @@ function mergeData(a, b){
     const inA = id in aD, inB = id in bD;
     const ta = aT[id]||0, tb = bT[id]||0;
     let v, t;
-    if(inA && inB){ v = ta >= tb ? aD[id] : bD[id]; t = Math.max(ta, tb); }
+    if(inA && inB){
+      if(choices[id] === "local"){ v = aD[id]; t = Math.max(ta, tb); }
+      else if(choices[id] === "remote"){ v = bD[id]; t = Math.max(ta, tb); }
+      else { v = ta >= tb ? aD[id] : bD[id]; t = Math.max(ta, tb); }
+    }
     else if(inA){ v = aD[id]; t = ta || 1; }
     else { v = bD[id]; t = tb || 1; }
     out.done[id] = v === true;
@@ -943,7 +1035,11 @@ function mergeData(a, b){
     const inA = id in aN, inB = id in bN;
     const ta = aNT[id]||0, tb = bNT[id]||0;
     let v, t;
-    if(inA && inB){ v = ta >= tb ? aN[id] : bN[id]; t = Math.max(ta, tb); }
+    if(inA && inB){
+      if(choices[id] === "local"){ v = aN[id]; t = Math.max(ta, tb); }
+      else if(choices[id] === "remote"){ v = bN[id]; t = Math.max(ta, tb); }
+      else { v = ta >= tb ? aN[id] : bN[id]; t = Math.max(ta, tb); }
+    }
     else if(inA){ v = aN[id]; t = ta || 1; }
     else { v = bN[id]; t = tb || 1; }
     out.notes[id] = v;
@@ -957,44 +1053,74 @@ function mergeData(a, b){
   return out;
 }
 
+/* ── 差异：算清楚「合并后本地会发生什么」 ── */
+function diffData(a, b){
+  const base = CFG.lastSyncTs || 0;
+  const out = { gain:[], lose:[], noteGain:[], noteLose:[], checkins:[], conflicts:[] };
+  const aD = a.done||{}, bD = b.done||{}, aT = a.doneTs||{}, bT = b.doneTs||{};
+
+  new Set([...Object.keys(aD), ...Object.keys(bD)]).forEach(id => {
+    const lv = aD[id] === true, rv = bD[id] === true;
+    if(lv === rv) return;
+    const lt = aT[id]||0, rt = bT[id]||0;
+    // 两边都在上次同步之后动过 → 真冲突，不能自动判
+    if(lt > base && rt > base){
+      out.conflicts.push({ kind:"done", id, localVal:lv, remoteVal:rv,
+                           prefer: lt >= rt ? "local" : "remote" });
+      return;
+    }
+    const win = taWin(lt, lv, rt, rv);
+    if(win && !lv) out.gain.push(id);
+    else if(!win && lv) out.lose.push(id);
+  });
+
+  const aN = a.notes||{}, bN = b.notes||{}, aNT = a.noteTs||{}, bNT = b.noteTs||{};
+  new Set([...Object.keys(aN), ...Object.keys(bN)]).forEach(id => {
+    const lv = (aN[id]||"").trim(), rv = (bN[id]||"").trim();
+    if(lv === rv) return;
+    const lt = aNT[id]||0, rt = bNT[id]||0;
+    if(lt > base && rt > base && lv && rv){
+      out.conflicts.push({ kind:"note", id, localVal:aN[id], remoteVal:bN[id],
+                           prefer: lt >= rt ? "local" : "remote" });
+      return;
+    }
+    if(lt >= rt) return;               // 本地更新，合并后本地不变
+    if(!lv && rv) out.noteGain.push(id);
+    else if(lv && !rv) out.noteLose.push(id);
+    else out.noteLose.push(id);        // 云端版本更新，会覆盖本地
+  });
+
+  const ac = a.checkins||[], bc = b.checkins||[];
+  out.checkins = bc.filter(x => !ac.includes(x)).sort();
+  return out;
+}
+function taWin(lt, lv, rt, rv){ return lt >= rt ? lv : rv; }
+
+function diffCount(d){
+  return d.gain.length + d.lose.length + d.noteGain.length +
+         d.noteLose.length + d.checkins.length + d.conflicts.length;
+}
+
 function logSync(msg, bad){
   syncLogs.unshift({ t:new Date().toLocaleTimeString("zh-CN"), msg, bad:!!bad });
   if(syncLogs.length > 6) syncLogs.length = 6;
   renderSync();
 }
 
-async function ghApi(path, opts){
-  opts = opts || {};
-  const r = await fetch("https://api.github.com" + path, {
-    method: opts.method || "GET",
-    headers: Object.assign({
-      "Authorization": "Bearer " + CFG.token,
-      "Accept": "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28"
-    }, opts.body ? { "Content-Type":"application/json" } : {}),
-    body: opts.body
-  });
-  if(!r.ok){
-    let m = "HTTP " + r.status;
-    try{ const j = await r.json(); if(j && j.message) m = j.message + " (" + r.status + ")"; }catch(e){}
-    throw new Error(m);
-  }
-  return r.json();
-}
-
-function payload(){ return { v:1, updatedAt:new Date().toISOString(), device:CFG.device, data:dataSnap() }; }
-
+/* ── 读写 ── */
 async function createGist(){
   if(!CFG.token) return toast("先保存 token");
   syncBusy = true; renderSync();
   try{
-    const j = await ghApi("/gists", { method:"POST", body: JSON.stringify({
+    const body = JSON.stringify({
       description:"HF 探索打卡 · 云存档",
       public:false,
-      files:{ "hf-quest.json":{ content: JSON.stringify(payload(), null, 2) } }
-    })});
-    CFG.gistId = j.id; CFG.lastAt = Date.now(); saveCfg();
-    logSync("已创建存档 " + j.id);
+      files:{ "hf-quest.json":{ content: JSON.stringify(makePayload(dataSnap(), 1, 0), null, 2) } }
+    });
+    const { json } = await api("/gists", { method:"POST", body });
+    CFG.gistId = json.id; CFG.rev = 1; CFG.lastAt = nowTs(); CFG.lastSyncTs = nowTs();
+    setPending(""); saveCfg();
+    logSync("已创建存档 " + json.id);
     toast("云存档已创建");
   }catch(e){
     logSync("创建失败：" + e.message, true);
@@ -1003,45 +1129,106 @@ async function createGist(){
 }
 
 async function pullRemote(){
-  const j = await ghApi("/gists/" + CFG.gistId);
-  const f = j.files && j.files["hf-quest.json"];
-  if(!f) return null;
-  let content = f.content;
-  if(f.truncated && f.raw_url) content = await (await fetch(f.raw_url)).text();
-  const p = JSON.parse(content);
-  return (p && p.data) ? p.data : p;
+  const { json } = await api("/gists/" + CFG.gistId);
+  const f = json.files && json.files["hf-quest.json"];
+  if(!f) return { data:null, rev:0, updatedAt:json.updated_at, device:"?" };
+  let c = f.content;
+  if(f.truncated && f.raw_url) c = await (await fetch(f.raw_url)).text();
+  const p = JSON.parse(c);
+  return { data:(p && p.data) ? p.data : p,
+           rev: (p && p.rev) || 0,
+           updatedAt: json.updated_at,
+           device: (p && p.device) || "?" };
 }
 
-async function pushRemote(d){
-  await ghApi("/gists/" + CFG.gistId, { method:"PATCH", body: JSON.stringify({
-    files:{ "hf-quest.json":{ content: JSON.stringify(
-      { v:1, updatedAt:new Date().toISOString(), device:CFG.device, data:d }, null, 2) } }
-  })});
+/* 写前复查 rev；不一致就放弃，交给外层重新合并 */
+async function pushRemote(data, baseRev){
+  const check = await pullRemote();
+  if(check.rev !== baseRev) return { stale:true, cur:check };
+  const body = JSON.stringify({
+    files:{ "hf-quest.json":{ content: JSON.stringify(makePayload(data, baseRev+1, baseRev), null, 2) } }
+  });
+  await api("/gists/" + CFG.gistId, { method:"PATCH", body });
+  return { stale:false, rev:baseRev + 1 };
 }
+
+/* ── 主流程 ── */
+let pendingRemote = null, pendingDiff = null, choices = {};
 
 async function syncNow(o){
   o = o || {};
   if(!CFG.token || !CFG.gistId){ if(!o.silent) toast("先保存 token 和 Gist ID"); return; }
   if(syncBusy) return;
-  syncBusy = true; renderSync();
+  syncBusy = true; renderSync(); renderHeader();
   try{
     const remote = await pullRemote();
-    const merged = remote ? mergeData(dataSnap(), remote) : dataSnap();
-    applying = true;
-    S.done = merged.done; S.doneTs = merged.doneTs;
-    S.notes = merged.notes; S.noteTs = merged.noteTs;
-    S.checkins = merged.checkins; S.acts = merged.acts;
-    saveRaw(); applying = false;
-    await pushRemote(merged);
-    CFG.lastAt = Date.now(); saveCfg();
-    logSync(remote ? "双向同步完成" : "存档为空，已上传本机进度");
-    if(!o.silent) toast("已同步");
-    render();
+
+    if(!remote.data){                       // 云端空：直接把本机推上去
+      const r = await pushRemote(dataSnap(), remote.rev);
+      if(r.stale) throw new Error("云端刚被修改，请再同步一次");
+      CFG.rev = r.rev; CFG.lastAt = nowTs(); CFG.lastSyncTs = nowTs(); setPending(""); saveCfg();
+      logSync("云端为空，已上传本机进度");
+      if(!o.silent) toast("已上传");
+      return;
+    }
+
+    const d = diffData(dataSnap(), remote.data);
+    // 只要会「本地丢东西」或「两边都改过」，自动同步就不许静默落笔
+    const needsReview = d.conflicts.length > 0 || d.lose.length > 0 || d.noteLose.length > 0;
+
+    if(needsReview && !o.force){
+      pendingRemote = remote; pendingDiff = d; choices = {};
+      d.conflicts.forEach(c => { if(!choices[c.id]) choices[c.id] = c.prefer; });
+      CFG.rev = remote.rev; setPending("conflict"); saveCfg();
+      logSync(d.conflicts.length
+        ? "发现 " + d.conflicts.length + " 处冲突，等待裁决"
+        : "云端会取消本地 " + (d.lose.length + d.noteLose.length) + " 项，等待确认", true);
+      if(o.silent) toast(d.conflicts.length ? "检测到跨设备冲突，去「云同步」处理" : "有变更需要你确认");
+      else openPreview();
+      return;
+    }
+
+    if(!o.silent){                          // 手动同步：先给人看，再落笔
+      pendingRemote = remote; pendingDiff = d; choices = {};
+      d.conflicts.forEach(c => { choices[c.id] = c.prefer; });
+      openPreview();
+      return;
+    }
+
+    await commitMerge(remote, d, {});
   }catch(e){
-    applying = false;
+    CFG.lastErr = e.message;
+    setPending("error"); saveCfg();
     logSync("同步失败：" + e.message, true);
     if(!o.silent) toast("同步失败：" + e.message);
-  }finally{ syncBusy = false; renderSync(); }
+  }finally{
+    syncBusy = false; renderSync(); renderHeader();
+  }
+}
+
+async function commitMerge(remote, d, ch){
+  const merged = mergeData(dataSnap(), remote.data, ch || {});
+  let r = await pushRemote(merged, remote.rev);
+
+  if(r.stale){                              // 有人抢先写了：用新基线再合一次
+    logSync("检测到并发写入，重新合并");
+    const again = await pullRemote();
+    const merged2 = mergeData(merged, again.data, ch || {});
+    r = await pushRemote(merged2, again.rev);
+    if(r.stale) throw new Error("连续并发冲突，请稍后重试");
+    applyData(merged2);
+  }else{
+    applyData(merged);
+  }
+  persist();
+
+  CFG.rev = r.rev; CFG.lastAt = nowTs(); CFG.lastSyncTs = nowTs();
+  setPending(""); saveCfg();
+  logSync("同步完成 → rev " + r.rev);
+  toast("已同步");
+  closeModal();
+  pendingRemote = null; pendingDiff = null;
+  render();
 }
 
 function scheduleSync(){
@@ -1049,19 +1236,155 @@ function scheduleSync(){
   syncTimer = setTimeout(() => syncNow({ silent:true }), 4000);
 }
 
+/* ── 预览 / 冲突裁决 / 历史 ── */
+function itemList(ids){
+  if(!ids.length) return "";
+  return `<ul style="margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--dim)">
+    ${ids.slice(0, 12).map(id => `<li>${esc(TITLE[id] || id)}</li>`).join("")}
+    ${ids.length > 12 ? `<li>… 还有 ${ids.length - 12} 项</li>` : ""}</ul>`;
+}
+
+function openPreview(){
+  if(!pendingDiff || !pendingRemote) return;
+  const d = pendingDiff;
+  const total = diffCount(d);
+  const rows = [];
+
+  if(d.gain.length) rows.push(`<div class="mrow ok"><b>本地将新增 ${d.gain.length} 项完成</b>${itemList(d.gain)}</div>`);
+  if(d.checkins.length) rows.push(`<div class="mrow ok"><b>云端多出 ${d.checkins.length} 天打卡</b>
+    <div style="font-size:12.5px;color:var(--dim);font-family:var(--mono);margin-top:4px">${d.checkins.join("  ")}</div></div>`);
+  if(d.noteGain.length) rows.push(`<div class="mrow ok"><b>云端笔记 ${d.noteGain.length} 条会补到本地</b>${itemList(d.noteGain)}</div>`);
+  if(d.lose.length) rows.push(`<div class="mrow warn"><b>⚠️ 本地 ${d.lose.length} 项会被取消（云端更晚取消）</b>${itemList(d.lose)}</div>`);
+  if(d.noteLose.length) rows.push(`<div class="mrow warn"><b>⚠️ 本地 ${d.noteLose.length} 条笔记会被云端覆盖</b>${itemList(d.noteLose)}</div>`);
+
+  if(d.conflicts.length){
+    rows.push(`<div class="mrow bad"><b>${d.conflicts.length} 处两边都改过，必须你来定</b>
+      <div style="font-size:12.5px;color:var(--dim2);margin-top:4px">这些如果自动合并，一定会吞掉某一台电脑上的修改。</div></div>`);
+    d.conflicts.forEach((c, i) => {
+      const isNote = c.kind === "note";
+      rows.push(`<div class="mrow">
+        <div style="font-size:13.5px;font-weight:600">${esc(TITLE[c.id] || c.id)} <span class="badge">${isNote ? "笔记" : "课程"}</span></div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn sm ${choices[c.id] === "local" ? "primary" : ""}" data-act="pick" data-id="${c.id}" data-side="local">
+            用本地 · ${isNote ? esc(String(c.localVal).slice(0,10)) + "…" : (c.localVal ? "已完成" : "未完成")}</button>
+          <button class="btn sm ${choices[c.id] === "remote" ? "primary" : ""}" data-act="pick" data-id="${c.id}" data-side="remote">
+            用云端 · ${isNote ? esc(String(c.remoteVal).slice(0,10)) + "…" : (c.remoteVal ? "已完成" : "未完成")}</button>
+          <span style="font-size:11.5px;color:var(--dim2);align-self:center">云端来自 ${esc(pendingRemote.device)}</span>
+        </div>
+      </div>`);
+    });
+  }
+
+  if(!rows.length) rows.push(`<div class="mrow ok"><b>两边已经一致</b><div style="font-size:13px;color:var(--dim)">没有需要合并的改动，同步只是刷新记录。</div></div>`);
+
+  showModal(`
+    <h2 style="margin:0 0 4px;font-size:16px">同步预览 <span class="badge">rev ${pendingRemote.rev} → ${pendingRemote.rev + 1}</span></h2>
+    <p class="sub" style="margin:0 0 14px">云端最后更新：${esc(pendingRemote.updatedAt || "?")} · 写入设备 ${esc(pendingRemote.device)}</p>
+    ${rows.join("")}
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+      <button class="btn primary" data-act="apply-merge">${d.conflicts.length ? "按我的选择合并并推送" : "合并并推送"}</button>
+      <button class="btn" data-act="close-modal">取消</button>
+      <div style="flex:1"></div>
+      <button class="btn sm" data-act="history">历史版本 / 回滚</button>
+    </div>`);
+}
+
+async function openHistory(){
+  showModal(`<h2 style="margin:0 0 10px;font-size:16px">历史版本</h2><div class="empty">读取中…</div>`);
+  try{
+    const { json } = await api("/gists/" + CFG.gistId + "/commits");
+    const list = (json || []).slice(0, 12);
+    showModal(`<h2 style="margin:0 0 4px;font-size:16px">历史版本 <span class="badge">${list.length} 个</span></h2>
+      <p class="sub">恢复是非破坏性的：它会把那一版原样写成一个新版本，不会删历史。</p>
+      ${list.map(c => `<div class="mrow" style="display:flex;gap:10px;align-items:center">
+          <div style="flex:1">
+            <div style="font:12.5px var(--mono);color:var(--dim)">${esc((c.version||"").slice(0,7))}</div>
+            <div style="font-size:13px">${esc(new Date(c.committed_at).toLocaleString("zh-CN"))}</div>
+          </div>
+          <button class="btn sm" data-act="restore" data-sha="${esc(c.version)}">恢复这一版</button>
+        </div>`).join("")}
+      <div style="margin-top:16px"><button class="btn" data-act="close-modal">关闭</button></div>`);
+  }catch(e){
+    showModal(`<h2 style="margin:0 0 10px;font-size:16px">历史版本</h2>
+      <div class="mrow bad">读取失败：${esc(e.message)}</div>
+      <div style="margin-top:16px"><button class="btn" data-act="close-modal">关闭</button></div>`);
+  }
+}
+
+async function restoreRev(sha){
+  if(!confirm("用 " + sha.slice(0,7) + " 这一版覆盖当前进度？\n会写成一个新版本，历史不会丢。")) return;
+  syncBusy = true; renderSync();
+  try{
+    const { json } = await api("/gists/" + CFG.gistId + "/" + sha);
+    const f = json.files && json.files["hf-quest.json"];
+    if(!f) throw new Error("这一版没有数据文件");
+    let c = f.content;
+    if(f.truncated && f.raw_url) c = await (await fetch(f.raw_url)).text();
+    const p = JSON.parse(c);
+    const old = (p && p.data) ? p.data : p;
+    applyData(old);
+    persist();
+    const cur = await pullRemote();
+    const r = await pushRemote(old, cur.rev);
+    if(r.stale) throw new Error("云端刚被修改，请重试");
+    CFG.rev = r.rev; CFG.lastSyncTs = nowTs(); CFG.lastAt = nowTs(); setPending(""); saveCfg();
+    logSync("已恢复到 " + sha.slice(0,7));
+    toast("已恢复");
+    closeModal(); render();
+  }catch(e){
+    logSync("恢复失败：" + e.message, true);
+    toast("恢复失败：" + e.message);
+  }finally{ syncBusy = false; renderSync(); }
+}
+
+/* ── 弹窗 ── */
+function showModal(html){
+  const m = document.getElementById("modal");
+  document.getElementById("modalBox").innerHTML = html;
+  m.classList.add("on");
+}
+function closeModal(){
+  document.getElementById("modal").classList.remove("on");
+}
+
+/* ── 状态渲染 ── */
+function syncStateText(){
+  if(!CFG.token || !CFG.gistId) return { k:"", label:"未配置", color:"var(--dim)" };
+  if(syncBusy) return { k:"busy", label:"同步中…", color:"var(--acc)" };
+  if(CFG.pending === "conflict") return { k:"conflict",
+    label: (pendingDiff && pendingDiff.conflicts.length) ? "有冲突待裁决" : "有变更待确认",
+    color:"var(--rose)" };
+  if(CFG.pending === "error") return { k:"error", label:"同步失败", color:"var(--rose)" };
+  if(CFG.pending === "dirty") return { k:"dirty", label:"待同步", color:"var(--acc)" };
+  return { k:"ok", label:"已同步", color:"var(--ok)" };
+}
+
 function renderSync(){
   const box = document.getElementById("syncState");
   if(!box) return;
-  const ok = !!(CFG.token && CFG.gistId);
+  const st = syncStateText();
   const last = CFG.lastAt ? new Date(CFG.lastAt).toLocaleString("zh-CN") : "从未";
+  const skew = CFG.offset ? Math.round(CFG.offset / 1000) : 0;
+
   box.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-    <span class="badge" style="border-color:${syncBusy ? "var(--acc)" : ok ? "var(--ok)" : "var(--line2)"};
-      color:${syncBusy ? "var(--acc)" : ok ? "var(--ok)" : "var(--dim)"}">
-      ${syncBusy ? "同步中…" : ok ? "已接通" : "未配置"}</span>
+    <span class="badge" style="border-color:${st.color};color:${st.color}">${st.label}</span>
     <span class="badge">最近同步：${esc(last)}</span>
+    ${CFG.rev ? `<span class="badge">rev ${CFG.rev}</span>` : ""}
     ${CFG.gistId ? `<a class="badge" href="https://gist.github.com/${esc(CFG.gistId)}" target="_blank" rel="noopener">打开 Gist ↗</a>` : ""}
-    ${CFG.token ? `<span class="badge">token 已保存 ····${esc(CFG.token.slice(-4))}</span>` : ""}
-  </div>`;
+    ${CFG.token ? `<span class="badge">token ····${esc(CFG.token.slice(-4))}</span>` : ""}
+    ${Math.abs(skew) >= 5 ? `<span class="badge" style="border-color:rgba(245,158,11,.4);color:#f59e0b">本机时钟差 ${skew}s，已自动校正</span>` : ""}
+  </div>
+  ${CFG.pending === "conflict"
+    ? `<div class="mrow bad" style="margin-top:12px">
+        ${pendingDiff
+          ? `<b>有 ${pendingDiff.conflicts.length || (pendingDiff.lose.length + pendingDiff.noteLose.length)} 处变更等着你确认</b>，处理前不会自动推送。`
+          : `<b>有未处理的变更</b>（可能是上次关闭页面时留下的），重新拉取一次就能看到。`}
+        <div style="margin-top:8px">
+          <button class="btn sm primary" data-act="${pendingDiff ? "open-preview" : "resync"}">${pendingDiff ? "现在处理" : "重新拉取"}</button>
+        </div>
+      </div>` : ""}
+  ${CFG.pending === "error" && CFG.lastErr
+    ? `<div class="mrow bad" style="margin-top:12px"><b>上次失败原因</b><div style="font-size:12.5px;font-family:var(--mono);margin-top:4px">${esc(CFG.lastErr)}</div></div>` : ""}`;
 
   const ti = document.getElementById("tokenIn");
   if(ti && document.activeElement !== ti) ti.value = "";
@@ -1203,6 +1526,30 @@ document.addEventListener("click", async e => {
   if(act === "create-gist"){ await createGist(); return; }
   if(act === "sync"){ await syncNow(); return; }
 
+  if(act === "opensync"){
+    const wasConflict = CFG.pending === "conflict";
+    S.view = "sync"; save(); render();
+    if(wasConflict){
+      if(pendingDiff) openPreview();
+      else syncNow();
+    }
+    return;
+  }
+  if(act === "resync"){ await syncNow(); return; }
+  if(act === "open-preview"){ if(pendingDiff) openPreview(); return; }
+  if(act === "pick"){ choices[el.dataset.id] = el.dataset.side; openPreview(); return; }
+  if(act === "apply-merge"){
+    try{ await commitMerge(pendingRemote, pendingDiff, choices); }
+    catch(e){
+      CFG.lastErr = e.message; setPending("error"); saveCfg(); logSync("合并失败：" + e.message, true);
+      toast("合并失败：" + e.message); renderSync(); renderHeader();
+    }
+    return;
+  }
+  if(act === "close-modal"){ closeModal(); return; }
+  if(act === "history"){ await openHistory(); return; }
+  if(act === "restore"){ await restoreRev(el.dataset.sha); return; }
+
   if(act === "export"){
     const data = JSON.stringify({ ...S, _exported:new Date().toISOString() }, null, 2);
     const a = document.createElement("a");
@@ -1291,10 +1638,19 @@ if(!Object.keys(S.open).length){
   // 首次使用：只展开第一个还没做完的阶段，避免一屏 42 课
   const first = LEVELS.find(l => l.items.some(i => !S.done[i.id])) || LEVELS[0];
   LEVELS.forEach(l => S.open[l.id] = (l === first));
-  saveRaw();
+  persist();
 }
 render();
 if(CFG.auto && CFG.token && CFG.gistId) syncNow({ silent:true });
+
+/* 网络恢复 / 切回标签页时补一次同步 */
+window.addEventListener("online", () => {
+  if(CFG.token && CFG.gistId && CFG.pending && CFG.pending !== "conflict") syncNow({ silent:true });
+});
+document.addEventListener("visibilitychange", () => {
+  if(document.visibilityState === "visible" && CFG.token && CFG.gistId &&
+     CFG.pending && CFG.pending !== "conflict" && !syncBusy) syncNow({ silent:true });
+});
 </script>
 </body>
 </html>
