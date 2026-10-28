@@ -93,9 +93,9 @@ main{padding-top:22px}
 
 /* ── items ── */
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-input[type=search],input[type=text]{background:var(--bg);border:1px solid var(--line);color:var(--tx);
+input[type=search],input[type=text],input[type=password]{background:var(--bg);border:1px solid var(--line);color:var(--tx);
   padding:9px 12px;border-radius:10px;font:14px inherit;outline:none;min-width:220px}
-input[type=search]:focus{border-color:var(--acc)}
+input[type=search]:focus,input[type=password]:focus{border-color:var(--acc)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .seg button{background:transparent;border:0;color:var(--dim);padding:8px 13px;font:13px inherit;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--panel2);color:var(--acc);font-weight:600}
