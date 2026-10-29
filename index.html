@@ -126,6 +126,8 @@ input[type=search]:focus,input[type=password]:focus{border-color:var(--acc)}
 .item .t{font-size:14px;font-weight:500}
 .item .t .lnk{font-size:12px;color:var(--dim2);margin-left:6px;white-space:nowrap}
 .item .t .lnk:hover{color:var(--acc)}
+.item .t .offb{font-size:10px;color:var(--acc);border:1px solid rgba(255,210,30,.35);
+  border-radius:5px;padding:0 4px;margin-left:4px;vertical-align:1px;white-space:nowrap}
 .item .d{font-size:12.5px;color:var(--dim);margin-top:3px}
 .item.done .t{color:var(--dim2);text-decoration:line-through;text-decoration-color:rgba(52,211,153,.5)}
 .item .note{width:100%;margin-top:7px;background:var(--bg);border:1px solid var(--line);color:var(--tx);
@@ -278,7 +280,7 @@ footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);color:v
         </div>
         <div>
           <p style="margin:0;font-size:13.5px;color:var(--dim)">
-            <b style="color:var(--tx)">网络提示</b>：你这台机器直连 huggingface.co 会超时，所以所有链接默认走 <code style="font-family:var(--mono);color:var(--acc)">hf-mirror.com</code> 镜像。真实下载前记得设：
+            <b style="color:var(--tx)">网络提示</b>：链接默认打开官方 huggingface.co；直连不通时可在「进度与徽章」切到 <code style="font-family:var(--mono);color:var(--acc)">hf-mirror.com</code>。账号、Spaces 等页面镜像不提供，会固定走官方。真实下载想走镜像时设：
           </p>
           <pre style="margin:8px 0 0;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:9px;font:12px/1.7 var(--mono);color:var(--dim);overflow:auto">$env:HF_ENDPOINT="https://hf-mirror.com"
 $env:HF_HOME="D:\dev_cache\huggingface"</pre>
@@ -339,7 +341,7 @@ $env:HF_HOME="D:\dev_cache\huggingface"</pre>
         <div style="font-size:13px;color:var(--dim)">
           <p style="margin:0 0 8px"><b style="color:var(--tx)">pipeline_tag</b>：任务类型。顺着它去 <code style="font-family:var(--mono)">/tasks</code> 找同类模型。</p>
           <p style="margin:0 0 8px"><b style="color:var(--tx)">createdAt</b>：太新（&lt;1 周）别急着进生产，等社区踩坑。</p>
-          <p style="margin:0">点模型名会跳镜像页，<code style="font-family:var(--mono)">Files</code> 里能看到权重分片和 <code style="font-family:var(--mono)">tokenizer.json</code>。</p>
+          <p style="margin:0">点模型名会按「链接站」设置打开（默认官方），<code style="font-family:var(--mono)">Files</code> 里能看到权重分片和 <code style="font-family:var(--mono)">tokenizer.json</code>。</p>
         </div>
       </div>
     </div>
@@ -428,18 +430,21 @@ $env:HF_HOME="D:\dev_cache\huggingface"</pre>
         <label style="font-size:12.5px;color:var(--dim);display:flex;align-items:center;gap:7px">
           链接站：
           <select id="baseSel" style="background:var(--bg);border:1px solid var(--line);color:var(--tx);padding:6px 9px;border-radius:8px;font-size:12.5px">
-            <option value="https://hf-mirror.com">hf-mirror.com（国内可用）</option>
-            <option value="https://huggingface.co">huggingface.co（官方）</option>
+            <option value="https://huggingface.co">huggingface.co（官方 · 完整）</option>
+            <option value="https://hf-mirror.com">hf-mirror.com（镜像 · 国内备用）</option>
           </select>
         </label>
       </div>
+      <p class="sub" style="margin:8px 0 0;font-size:11.5px">
+        文档、模型、数据集跟随上面的选择；注册、Token 设置、Spaces 页面镜像不提供，固定走官方。
+      </p>
       <div id="history"></div>
     </div>
   </section>
 
   <footer>
     单文件离线版 · 无外部依赖 · 进度只存在你自己的浏览器里<br>
-    链接默认走 <code style="font-family:var(--mono)">hf-mirror.com</code>，因为本机直连 huggingface.co 超时（已验证 curl: 28）。
+    链接默认打开官方 huggingface.co；可在「进度与徽章」切换镜像（账号 / Spaces 页固定官方）。
   </footer>
 </main>
 
@@ -479,7 +484,7 @@ const LEVELS = [
     items:[
       { id:"l1-1", t:"装 Python 环境", d:"推荐 uv 或 venv，Python 3.10+。验证：python -c \"import sys;print(sys.version)\" 有输出（注意本机目前 python 是商店占位符，需要真装）。", l:"/docs/transformers/installation" },
       { id:"l1-2", t:"装核心三件", d:"pip install transformers datasets accelerate + torch。验证：python -c \"import transformers\" 不报错。", l:"/docs/transformers/installation" },
-      { id:"l1-3", t:"配镜像与缓存路径", d:"设 HF_ENDPOINT=https://hf-mirror.com、HF_HOME=D:\\dev_cache\\huggingface、HF_HUB_ENABLE_HF_TRANSFER=1。验证：下载不再超时。", l:"/docs/huggingface_hub/guides/download" },
+      { id:"l1-3", t:"配缓存路径（可选镜像）", d:"设 HF_HOME=D:\\dev_cache\\huggingface、HF_HUB_ENABLE_HF_TRANSFER=1；直连慢时再加 HF_ENDPOINT=https://hf-mirror.com。验证：下载不再超时。", l:"/docs/huggingface_hub/guides/download" },
       { id:"l1-4", t:"pipeline 五行跑通", d:"pipeline('sentiment-analysis') 跑一句话。验证：输出 POSITIVE/NEGATIVE 与分数。", l:"/docs/transformers/quicktour" },
       { id:"l1-5", t:"AutoTokenizer + AutoModel 手动加载", d:"不用 pipeline，自己 tokenizer → model(**inputs)。验证：打印出 logits.shape 并解释每个维度。", l:"/docs/transformers/task_summary" },
       { id:"l1-6", t:"玩生成参数", d:"temperature / top_p / repetition_penalty / max_new_tokens 各调一次。验证：同一 prompt 两次输出不同，且能解释原因。", l:"/docs/transformers/llm_tutorial" },
@@ -599,9 +604,10 @@ const ALL = LEVELS.flatMap(l => l.items);
 
 const S = {
   done:{}, doneTs:{}, notes:{}, noteTs:{}, checkins:[], acts:{},
-  view:"today", filter:"all", base:"https://hf-mirror.com", open:{}
+  view:"today", filter:"all", base:"https://huggingface.co", baseVer:0, basePicked:false, open:{}
 };
 let liveState = { items:null, at:null, src:"未加载", loading:false };
+const LIVE_API = "https://hf-mirror.com";
 
 const CKEY = "hf-sync-v1";
 const CFG = { token:"", gistId:"", auto:true, lastAt:0, device:"" };
@@ -615,6 +621,12 @@ function load(){
   if(!S.open) S.open = {};
   if(!S.doneTs) S.doneTs = {};
   if(!S.noteTs) S.noteTs = {};
+  // v2：链接默认改回官方站。老用户如果没手动选过链接站，迁移一次；手动选过的保留。
+  if(!S.baseVer || S.baseVer < 2){
+    if(!S.basePicked) S.base = "https://huggingface.co";
+    S.baseVer = 2;
+    persist();
+  }
 }
 function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 function saveRaw(){
@@ -678,7 +690,23 @@ function bump(delta){
 }
 
 /* ═══════════════════ 工具 ═══════════════════ */
-function link(p){ return /^https?:/i.test(p) ? p : S.base + p; }
+/* 镜像站不提供账号、设置和 Spaces 页面，这些链接永远走官方 */
+function mustOfficial(p){
+  return p === "/" || /^\/(join|login|settings|spaces)(\/|$|\?)/.test(p);
+}
+function link(p){
+  if(/^https?:/i.test(p)) return p;
+  return (mustOfficial(p) ? "https://huggingface.co" : S.base) + p;
+}
+function linkInfo(p){
+  let label = "文档";
+  if(p === "/") label = "官网";
+  else if(/^\/join/.test(p)) label = "注册";
+  else if(/^\/settings\//.test(p)) label = "设置";
+  else if(/^\/spaces/.test(p)) label = "Spaces";
+  else if(!/^\/docs\//.test(p)) label = "打开";
+  return { href:link(p), label, official:mustOfficial(p) };
+}
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function num(n){ return n >= 1e6 ? (n/1e6).toFixed(1)+"M" : n >= 1e3 ? (n/1e3).toFixed(1)+"k" : String(n); }
 let toastTimer;
@@ -802,10 +830,11 @@ function renderPath(){
 
     for(const it of items){
       const on = !!S.done[it.id];
+      const lk = linkInfo(it.l);
       html += `<div class="item ${on ? "done" : ""}">
         <button class="ck" role="checkbox" aria-checked="${on}" data-act="lesson" data-id="${it.id}" aria-label="标记完成"></button>
         <div class="body">
-          <div class="t">${esc(it.t)}<a class="lnk" href="${link(it.l)}" target="_blank" rel="noopener">文档 ↗</a></div>
+          <div class="t">${esc(it.t)}<a class="lnk" href="${lk.href}" target="_blank" rel="noopener"${lk.official ? ' title="镜像站不提供这个页面，固定打开官方站"' : ""}>${lk.label} ↗</a>${lk.official ? '<span class="offb">官方</span>' : ""}</div>
           <div class="d">${esc(it.d)}</div>
           <input class="note" type="text" data-note="${it.id}" placeholder="一句话笔记：这课我学到了…"
                  value="${esc(S.notes[it.id] || "")}">
@@ -842,7 +871,7 @@ function renderLive(){
   meta.textContent = liveState.src;
 
   if(liveState.loading){
-    body.innerHTML = `<div class="empty">正在从 ${esc(S.base)} 拉取…</div>`;
+    body.innerHTML = `<div class="empty">正在从 ${esc(LIVE_API)} 拉取…</div>`;
     return;
   }
   const items = liveState.items;
@@ -852,7 +881,7 @@ function renderLive(){
     return;
   }
   document.getElementById("liveMeta").textContent =
-    `来源 ${S.base} · 时间 ${liveState.at}` + (liveState.err ? " · ⚠️ 实时失败，以下为离线快照" : "");
+    `来源 ${esc(LIVE_API)} · 时间 ${liveState.at}` + (liveState.err ? " · ⚠️ 实时失败，以下为离线快照" : "");
 
   body.innerHTML = `<table>
     <thead><tr><th style="width:34px">#</th><th>模型</th><th>任务</th>
@@ -872,7 +901,7 @@ async function fetchLive(){
   try{
     const c = new AbortController();
     const t = setTimeout(() => c.abort(), 12000);
-    const r = await fetch(S.base + "/api/models?sort=trendingScore&direction=-1&limit=20", { signal:c.signal });
+    const r = await fetch(LIVE_API + "/api/models?sort=trendingScore&direction=-1&limit=20", { signal:c.signal });
     clearTimeout(t);
     if(!r.ok) throw new Error("HTTP " + r.status);
     const j = await r.json();
@@ -1611,7 +1640,8 @@ document.getElementById("fileIn").addEventListener("change", e => {
 });
 
 document.getElementById("baseSel").addEventListener("change", e => {
-  S.base = e.target.value; save(); render(); toast("链接站已切换为 " + S.base);
+  S.base = e.target.value; S.basePicked = true; save(); render();
+  toast("链接站已切换为 " + S.base);
 });
 
 document.addEventListener("change", e => {
