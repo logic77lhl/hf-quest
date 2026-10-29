@@ -482,6 +482,29 @@ const LEVELS = [
     items:[
       { id:"l0-1", t:"注册账号并完善 profile",
         d:"动作：注册 → 填头像、bio、时区。验证：你的 /用户名 主页能打开，且 bio 写了一句话定位。",
+        gt:"中文导读 · 账号是你的门牌号",
+        g:`<p><b>一句话：</b>用户名不是昵称，是你在 Hub 上的门牌号。它会出现在每个仓库地址里（<code>huggingface.co/你的名字/模型名</code>），也会出现在别人引用你的地方。</p>
+<p>注册只是拿到钥匙，profile 才是让人知道你是谁。用邮箱或 GitHub 注册、验证邮箱，再花 5 分钟填下面几项。</p>
+<div class="gscroll"><table>
+<thead><tr><th>字段</th><th>怎么填</th><th>为什么重要</th><th>常见错</th></tr></thead>
+<tbody>
+<tr><td><b>Username</b></td><td>小写字母、数字、连字符，短且可读，最好和 GitHub 一致</td><td>它是命名空间，仓库 URL 永久带着它</td><td>用 <code>user123456</code> 或中文，以后每个链接都不好看</td></tr>
+<tr><td><b>Display name</b></td><td>真名、常用 ID 都行，随时能改</td><td>只影响展示，不影响 URL</td><td>和 username 搞混，以为改昵称会改地址</td></tr>
+<tr><td><b>Avatar</b></td><td>一张稳定的头像</td><td>讨论区、组织成员列表里靠它认人</td><td>空着，看起来像小号</td></tr>
+<tr><td><b>Bio</b></td><td>一句话：我是谁 + 正在用 HF 做什么</td><td>别人点进主页 3 秒知道要不要继续看</td><td>写「热爱 AI」「终身学习」，等于没写</td></tr>
+<tr><td><b>Links</b></td><td>GitHub、博客、知乎，选一两个</td><td>作品之外的可信度</td><td>塞一排链接，没有一个能打开</td></tr>
+<tr><td><b>Timezone</b></td><td>选你实际所在时区</td><td>通知、Daily Papers 的时间才对得上</td><td>不改，所有时间都错位</td></tr>
+</tbody></table></div>
+<p><b>顺序：</b></p>
+<ol>
+<li>打开 <code>/join</code>，用邮箱或 GitHub 注册，去邮箱点验证链接。</li>
+<li>进 <code>/settings/profile</code>，填 display name、头像、bio、时区。</li>
+<li>打开 <code>huggingface.co/你的用户名</code>，确认头像和 bio 都在。</li>
+<li>把 username 记下来——后面配 token、建仓库、拼数据集路径都要用。</li>
+</ol>
+<p><b>bio 怎么写：</b>「在做中文 RAG，正在把 HF 的模型跑通」比「AI 爱好者」有用得多。前者让别人知道能不能找你聊，后者什么也没说。</p>
+<p><b>两个提醒：</b>用户名可以改，但仓库地址会跟着变，别等有了作品再改；这一步<em>不需要</em>创建 token，token 是 l5-5 的事，现在只要知道它不等于密码。</p>
+<p><b>怎么算过关：</b>把主页链接发给一个不了解你的人，他能不看解释说出你大概在做什么。做不到就回去改 bio。</p>`,
         l:"/join" },
       { id:"l0-2", t:"认清六个入口",
         d:"Models / Datasets / Spaces / Papers / Posts / Chat+Inference。验证：一句话说出各自的用途，不看页面也能背下来。",
@@ -522,16 +545,128 @@ Posts                  横跨全部：记录别人（和你）踩过的坑</pre>
 <p style="color:var(--dim2);font-size:12px">官方站的中文文档（部分翻译）：<a href="https://huggingface.co/docs/hub/zh/index" target="_blank" rel="noopener">huggingface.co/docs/hub/zh</a>。它主要覆盖 Models / Datasets / Spaces，不覆盖 Papers / Posts / Chat；遇到版本差异以英文原文为准。</p>`,
         l:"/" },
       { id:"l0-3", t:"拆解一个模型页",
-        d:"看 Files 分片、model card、Tags、License、Downloads、Use this model。验证：能解释 safetensors 为什么要分片（2GB 单文件上限）。",
+        d:"看 Files 分片、model card、Tags、License、Downloads、Use this model。验证：能解释为什么要分片，以及 index 文件是干什么的。",
+        gt:"中文导读 · 30 秒看懂一个模型页",
+        g:`<p><b>一句话：</b>模型页不是说明书，是一张体检报告。固定按六个区域看，30 秒能判断「这是什么、多大、能不能用」。</p>
+<div class="gscroll"><table>
+<thead><tr><th>区域</th><th>看什么</th><th>能判断出</th></tr></thead>
+<tbody>
+<tr><td><b>标题与作者</b></td><td>命名空间是官方、组织还是个人</td><td>可信度、谁在维护</td></tr>
+<tr><td><b>Tags</b></td><td>task、library、language、license、base_model、量化标记</td><td>任务、能不能直接加载、是不是微调、什么许可</td></tr>
+<tr><td><b>Model card</b></td><td>Intended use、训练数据、评测、局限</td><td>该不该用、它会在哪失败</td></tr>
+<tr><td><b>Files and versions</b></td><td>safetensors 分片、index、tokenizer、config、gguf</td><td>文件齐不齐、多大、能不能本地跑</td></tr>
+<tr><td><b>Use this model</b></td><td>示例代码 import 哪个库、要不要 <code>trust_remote_code</code></td><td>你的环境能不能直接跑</td></tr>
+<tr><td><b>License + Community</b></td><td>LICENSE 原文、issue 里在报什么错</td><td>能不能商用、有没有已知坑</td></tr>
+</tbody></table></div>
+<p><b>为什么会有 <code>-00001-of-00003</code> 这种文件：</b></p>
+<pre>model-00001-of-00003.safetensors   第 1 片，不是「第一版」
+model-00002-of-00003.safetensors
+model-00003-of-00003.safetensors
+model.safetensors.index.json       张量 → 分片的对照表</pre>
+<p>分片不是平台强制的大小限制（Hub 的单文件硬上限其实很大），而是工程选择：单个几十 GB 的文件一旦断线要整份重下；分片能并行下载、单独重试；safetensors 支持内存映射，可以按需读取，不必把整个模型一次性塞进内存。<code>save_pretrained</code> 里的 <code>max_shard_size</code> 决定切多大，所以不同仓库的分片大小并不统一——<b>看 index 文件，不要猜</b>。</p>
+<p><b>三个立刻能用的判断：</b></p>
+<ol>
+<li><b>显存够不够</b>：bf16 大约「参数量 × 2 字节」。8B 模型光权重约 16GB，加上 KV cache 和框架开销，24GB 卡才比较稳；4bit 量化大约除以 4。</li>
+<li><b>能不能商用</b>：看 LICENSE，不看 tag。tag 写 apache-2.0 但仓库里 LICENSE 不同时，以 LICENSE 为准。</li>
+<li><b>是不是微调</b>：Tags 里的 <code>base_model</code> 指向底座模型，许可证通常也跟着底座走。</li>
+</ol>
+<p><b>真实路径：</b>挑一个你听过的模型，按表格从上到下走一遍，写下三行：它做什么任务、多大、能不能商用。写不出来，就说明还有区域没看。</p>
+<p><b>怎么算过关：</b>给别人介绍这个模型，三句话内说清「干什么、多大、能不能商用」，并且能指出 index 文件在哪。</p>`,
         l:"/docs/hub/models-the-hub" },
       { id:"l0-4", t:"搞懂 gated 模型与许可证",
         d:"找 2 个 gated 模型、2 个 apache-2.0 模型。验证：判断各自能不能直接商用，写下结论。",
+        gt:"中文导读 · 门禁和许可是两件事",
+        g:`<p><b>一句话：</b>gated 是门禁，license 是门里面的规矩。门禁放你进去，不等于允许你拿它赚钱。</p>
+<div class="gscroll"><table>
+<thead><tr><th>状态 / 许可</th><th>含义</th><th>你要做什么</th></tr></thead>
+<tbody>
+<tr><td><b>public</b></td><td>任何人可下载</td><td>仍然要看 license</td></tr>
+<tr><td><b>gated · 自动批准</b></td><td>登录后点同意，立即拿到权限</td><td>先读条款内容，再点</td></tr>
+<tr><td><b>gated · 人工批准</b></td><td>提交申请，作者逐个审</td><td>写清用途，等邮件；别拿小号重复申请</td></tr>
+<tr><td><b>private</b></td><td>只有作者和组织成员可见</td><td>需要被邀请</td></tr>
+<tr><td><b>apache-2.0 / mit</b></td><td>允许商用、修改、分发</td><td>保留版权与许可声明；apache 还含专利授权条款</td></tr>
+<tr><td><b>cc-by-nc-4.0</b></td><td>允许使用，禁止商业用途</td><td>收费产品、公司内部生产系统都要谨慎</td></tr>
+<tr><td><b>llama 社区许可</b></td><td>可商用，但带条件</td><td>读附加条款：超大用户量要单独授权、要遵守使用政策、要标注</td></tr>
+<tr><td><b>gemma 条款</b></td><td>可商用，受使用政策约束</td><td>看禁止用途清单，别踩线</td></tr>
+</tbody></table></div>
+<p><b>四件容易搞错的事：</b></p>
+<ol>
+<li><b>gated 不等于不能商用</b>，它只控制「谁能下载」；<b>license 才决定「下载后能干什么」</b>。</li>
+<li><b>模型卡的 license tag 可能和 LICENSE 文件不一致</b>。以仓库里的 LICENSE 原文为准；冲突时去讨论区问作者。</li>
+<li><b>微调模型继承底座的许可</b>。看 Tags 里的 <code>base_model</code>；底座不允许商用，微调版通常也不行。</li>
+<li><b>同意条款之后，你的 token 才带权限</b>。网页上点过同意，命令行用同一账号的 token 就能拉；CI 里别用账号密码。</li>
+</ol>
+<p><b>30 分钟练习：</b></p>
+<ol>
+<li>打开 <code>/models?gated=true</code>，找 2 个 gated 模型，记下各自是自动还是人工批准。</li>
+<li>打开 <code>/models?license=apache-2.0</code>，找 2 个，读 LICENSE 前 20 行，找到「必须保留声明」那一句。</li>
+<li>找一个 llama 系模型，读它许可里关于商业使用的段落。</li>
+<li>做一张四列表：模型 / gated 类型 / 许可证 / 能否商用 + 附加条件。</li>
+</ol>
+<p><b>怎么算过关：</b>给你一个模型链接，5 分钟内能回答「我能不能把它放进一个收费产品，需要做什么」。答不上来，就是 LICENSE 没读到关键段落。</p>
+<p style="color:var(--dim2);font-size:12px">这不是法律意见。真要商用，让法务读 LICENSE 原文；中文翻译只作参考。</p>`,
         l:"/docs/hub/models-gated" },
       { id:"l0-5", t:"掌握搜索语法",
-        d:"author: task: library: language: size sort:downloads 组合过滤。验证：用 3 个过滤器组合精准搜到一个模型。",
+        d:"用 author、pipeline_tag、library、language、num_parameters、sort 组合过滤。验证：用 3 个过滤器组合精准搜到一个模型。",
+        gt:"中文导读 · 用地址栏做精确搜索",
+        g:`<p><b>一句话：</b>搜索框是给大概的，URL 参数是给精确的。学会看地址栏，比背语法有用。</p>
+<div class="gscroll"><table>
+<thead><tr><th>想缩小到</th><th>参数</th><th>例子</th></tr></thead>
+<tbody>
+<tr><td>关键词</td><td><code>search</code></td><td><code>?search=embedding</code></td></tr>
+<tr><td>作者 / 组织</td><td><code>author</code></td><td><code>?author=Qwen</code></td></tr>
+<tr><td>任务</td><td><code>pipeline_tag</code></td><td><code>?pipeline_tag=text-generation</code></td></tr>
+<tr><td>库</td><td><code>library</code></td><td><code>?library=transformers</code></td></tr>
+<tr><td>语言</td><td><code>language</code></td><td><code>?language=zh</code></td></tr>
+<tr><td>许可证</td><td><code>license</code></td><td><code>?license=apache-2.0</code></td></tr>
+<tr><td>参数量</td><td><code>num_parameters</code></td><td><code>?num_parameters=min:1B,max:10B</code></td></tr>
+<tr><td>是否门禁</td><td><code>gated</code></td><td><code>?gated=true</code></td></tr>
+<tr><td>排序</td><td><code>sort</code></td><td><code>?sort=downloads</code> / <code>likes</code> / <code>lastModified</code> / <code>trending</code></td></tr>
+</tbody></table></div>
+<p><b>不用背这张表。</b>点一下页面上的筛选器，看地址栏怎么变——这些参数就是筛选器的序列化。参数拼错时页面会报 400，这也是一种提示。</p>
+<p><b>从模糊到精确，一次真实的收窄：</b></p>
+<pre>1. 搜 qwen                       结果太杂，混着微调、量化、别人的二次上传
+2. 加 author=Qwen                只剩官方发布
+3. 加 pipeline_tag=text-generation
+4. 加 language=zh
+5. 加 num_parameters=min:1B,max:10B
+6. 加 sort=downloads             按累计下载排，先看被验证过的</pre>
+<p>最终地址可以存成书签：</p>
+<pre>huggingface.co/models?author=Qwen&amp;pipeline_tag=text-generation&amp;language=zh&amp;sort=downloads</pre>
+<p><b>两个必须知道的区别：</b></p>
+<ol>
+<li><b>downloads 是累计，trending 是近期。</b>老模型靠历史下载量霸榜，trending 更能看出这两个月大家在用什么。</li>
+<li><b>参数量不是文件大小。</b>同是 8B，bf16 约 16GB，4bit 量化约 5GB；用 <code>num_parameters</code> 筛掉跑不动的，再去 Files 看实际精度。</li>
+</ol>
+<p><b>三个组合，直接抄：</b></p>
+<pre>中文文本生成：?pipeline_tag=text-generation&amp;language=zh&amp;sort=trending
+可商用的小模型：?license=apache-2.0&amp;num_parameters=min:1B,max:10B&amp;sort=likes
+中文向量模型：?search=embedding&amp;language=zh&amp;library=sentence-transformers</pre>
+<p><b>怎么算过关：</b>给一个需求——「中文、可商用、10B 以下、文本生成」——你能在一分钟内拼出 URL，并说出前三个候选和它们的许可证。</p>`,
         l:"/models" },
       { id:"l0-6", t:"关注与组织",
-        d:"like / watch / 加入 organization。验证：关注 3 个组织（如 Qwen、deepseek-ai、google），首页动态开始有内容。",
+        d:"like / watch / 关注组织 / 建 Collection。验证：能说出 like 与 watch 的区别，并 watch 到一个真实更新。",
+        gt:"中文导读 · 收藏、订阅、协作别混用",
+        g:`<p><b>一句话：</b>like 是收藏，watch 是订阅，org 是工作单位。三个动作解决三个不同的问题。</p>
+<div class="gscroll"><table>
+<thead><tr><th>动作</th><th>作用</th><th>什么时候用</th><th>代价</th></tr></thead>
+<tbody>
+<tr><td><b>Like</b></td><td>公开收藏，同时给作者一个信号</td><td>想以后找回、想支持作者</td><td>会显示在主页，不是私有书签</td></tr>
+<tr><td><b>Watch</b></td><td>订阅这个仓库的讨论、PR、新版本</td><td>正在等 bug 修复或等新权重</td><td>通知会变多，别全 watch</td></tr>
+<tr><td><b>Follow</b></td><td>订阅用户或组织的动态</td><td>追一个团队在做什么</td><td>首页和通知会变吵</td></tr>
+<tr><td><b>Organization</b></td><td>团队命名空间 + 成员角色（管理员 / 可写 / 只读）</td><td>多人协作、发布官方仓库</td><td>个人号替代不了，权限要提前分</td></tr>
+<tr><td><b>Collection</b></td><td>把模型、数据集、Space 编成主题清单</td><td>做选型对比、给自己建索引</td><td>只是引用，不复制仓库</td></tr>
+</tbody></table></div>
+<p><b>组织为什么不能用个人号代替：</b>模型挂在组织名下，作者离职、账号异常都不影响仓库归属；权限按角色发，不用共享密码；计费和存储也算在组织账上。</p>
+<p><b>15 分钟动作：</b></p>
+<ol>
+<li>like 3 个你确定会再用的模型——不是「看起来厉害」的。</li>
+<li>watch 1 个你正在等更新的模型，只 watch 一个，体会通知量。</li>
+<li>关注 Qwen、deepseek-ai、google 三个组织。</li>
+<li>建一个 Collection，比如「中文 embedding 候选」，收 3 个并各写一句为什么。</li>
+<li>打开通知设置，把邮件压到只留「有人提到我」和「我参与的讨论」。</li>
+</ol>
+<p><b>怎么算过关：</b>能说清 like 和 watch 的区别；一周后通知里至少有一条是真实更新，而不是纯噪音；Collection 里每个条目都写得出收录理由。</p>`,
         l:"/organizations" }
     ]},
 
