@@ -133,6 +133,25 @@ input[type=search]:focus,input[type=password]:focus{border-color:var(--acc)}
 .item .note{width:100%;margin-top:7px;background:var(--bg);border:1px solid var(--line);color:var(--tx);
   border-radius:8px;padding:6px 9px;font:12.5px/1.5 inherit;resize:vertical;height:31px;transition:height .15s;outline:none}
 .item .note:focus{height:78px;border-color:var(--acc)}
+.item .guide{margin-top:9px;border:1px solid var(--line);border-radius:10px;
+  background:rgba(10,14,21,.55);overflow:hidden}
+.item .guide summary{cursor:pointer;padding:9px 12px;font-size:12.5px;color:var(--acc);list-style:none;user-select:none}
+.item .guide summary::-webkit-details-marker{display:none}
+.item .guide summary::before{content:"▸";display:inline-block;width:13px;color:var(--dim2)}
+.item .guide[open] summary::before{content:"▾"}
+.item .guide .gb{padding:2px 13px 13px;font-size:13px;line-height:1.75;color:var(--dim)}
+.item .guide .gb p{margin:8px 0}
+.item .guide .gb b{color:var(--tx)}
+.item .guide .gb .gscroll{overflow-x:auto;margin:8px 0}
+.item .guide .gb table{font-size:12px;margin:0;min-width:560px}
+.item .guide .gb th,.item .guide .gb td{border:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.item .guide .gb th{white-space:nowrap;text-transform:none;letter-spacing:0;font-size:11.5px;color:var(--tx)}
+.item .guide .gb td:first-child{white-space:nowrap}
+.item .guide .gb pre{margin:8px 0;padding:10px 12px;background:var(--bg);border:1px solid var(--line);
+  border-radius:8px;font:11.5px/1.7 var(--mono);color:var(--dim2);overflow:auto}
+.item .guide .gb ol{margin:6px 0;padding-left:20px}
+.item .guide .gb li{margin:4px 0}
+.item .guide .gb code{font-family:var(--mono);font-size:11.5px;color:var(--acc)}
 
 /* ── quests ── */
 .qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
@@ -464,7 +483,44 @@ const LEVELS = [
       { id:"l0-1", t:"注册账号并完善 profile",
         d:"动作：注册 → 填头像、bio、时区。验证：你的 /用户名 主页能打开，且 bio 写了一句话定位。",
         l:"/join" },
-      { id:"l0-2", t:"认清六个入口", d:"Models / Datasets / Spaces / Papers / Posts / Chat+Inference。验证：一句话说出各自的用途，不看页面也能背下来。", l:"/" },
+      { id:"l0-2", t:"认清六个入口",
+        d:"Models / Datasets / Spaces / Papers / Posts / Chat+Inference。验证：一句话说出各自的用途，不看页面也能背下来。",
+        gt:"中文导读 · 六个入口怎么记",
+        g:`<p><b>先记住一句话：</b>六个入口不是六个栏目，是六个问题。不用按导航栏顺序学，只要知道「我现在要解决什么，该点哪个」。</p>
+<p><b>六个词：</b>权重、数据、演示、方法、经验、直接用。</p>
+<div class="gscroll"><table>
+<thead><tr><th>入口</th><th>回答的问题</th><th>什么时候去</th><th>最容易误会</th></tr></thead>
+<tbody>
+<tr><td><b>Models</b></td><td>有没有人已经训练好了？</td><td>找现成权重、看许可证、比任务 / 语言 / 下载量</td><td>下载量高 ≠ 适合你；先看 task、license、gated、文件格式</td></tr>
+<tr><td><b>Datasets</b></td><td>拿什么数据训练或评测？</td><td>找语料、看 split / 字段 / 条数、流式处理</td><td>大 ≠ 好；先看许可证、字段含义、测试集有没有污染</td></tr>
+<tr><td><b>Spaces</b></td><td>跑起来是什么效果？</td><td>不想装环境就想试；或发布自己的 demo</td><td>免费 CPU 很慢；demo 能跑 ≠ 能上生产</td></tr>
+<tr><td><b>Papers</b></td><td>最近有什么新方法？</td><td>追前沿、找论文对应的代码 / 权重 / 数据</td><td>社区投票高 ≠ 权威；先看有没有官方实现</td></tr>
+<tr><td><b>Posts</b></td><td>别人是怎么做的？</td><td>找教程、复盘、发布说明、踩坑记录</td><td>教程会过期；先看日期和对应的库版本</td></tr>
+<tr><td><b>Chat + Inference</b></td><td>不写代码能不能直接用？</td><td>试 LLM、拿 API、比较不同推理供应商</td><td>Chat 是产品，Inference Providers 是 API；免费额度有限</td></tr>
+</tbody></table></div>
+<p><b>它们不是并列的，是一条链：</b></p>
+<pre>Papers                 告诉你「为什么」和「怎么做」
+  ↓
+Models + Datasets      提供「材料」：权重和数据
+  ↓
+Spaces                 证明「它真的能跑」，也是发布作品的地方
+  ↓
+Chat / Inference       变成「别人可以直接用」的形态
+
+Posts                  横跨全部：记录别人（和你）踩过的坑</pre>
+<p><b>一条真实路径：</b>读一篇 Daily Paper → 点它关联的 Model → 在 Space 里试 → 效果不够就找 Dataset 微调 → 把结果部署成新的 Space → 在 Posts 写三行复盘。走完这一圈，六个入口就串起来了。</p>
+<p><b>10 分钟验证（照着点一遍）：</b></p>
+<ol>
+<li><b>Models</b>：搜 <code>task:text-generation language:zh</code>，按 downloads 排序，记下前 3 个的 license。</li>
+<li><b>Datasets</b>：找一个中文 instruct 数据集，看它的 split、字段和条数。</li>
+<li><b>Spaces</b>：搜一个文本生成 demo，打开玩 1 分钟，记下它用的模型。</li>
+<li><b>Papers</b>：看今天 Daily Papers 的第一条，点它关联的 model。</li>
+<li><b>Posts</b>：找一篇 2025 年之后的 fine-tuning 文章，记下一个和你环境有关的坑。</li>
+<li><b>Chat</b>：打开 Chat 问一个你真正关心的问题，比较它和 Space demo 的回答风格。</li>
+</ol>
+<p><b>怎么算过关：</b>合上页面，用一句话说出每个入口回答的问题，并各举一个你刚点过的例子。背不下来没关系，能查到位就行。</p>
+<p style="color:var(--dim2);font-size:12px">官方站的中文文档（部分翻译）：<a href="https://huggingface.co/docs/hub/zh/index" target="_blank" rel="noopener">huggingface.co/docs/hub/zh</a>。它主要覆盖 Models / Datasets / Spaces，不覆盖 Papers / Posts / Chat；遇到版本差异以英文原文为准。</p>`,
+        l:"/" },
       { id:"l0-3", t:"拆解一个模型页",
         d:"看 Files 分片、model card、Tags、License、Downloads、Use this model。验证：能解释 safetensors 为什么要分片（2GB 单文件上限）。",
         l:"/docs/hub/models-the-hub" },
@@ -836,6 +892,7 @@ function renderPath(){
         <div class="body">
           <div class="t">${esc(it.t)}<a class="lnk" href="${lk.href}" target="_blank" rel="noopener"${lk.official ? ' title="镜像站不提供这个页面，固定打开官方站"' : ""}>${lk.label} ↗</a>${lk.official ? '<span class="offb">官方</span>' : ""}</div>
           <div class="d">${esc(it.d)}</div>
+          ${it.g ? `<details class="guide"><summary>${esc(it.gt || "中文导读")}</summary><div class="gb">${it.g}</div></details>` : ""}
           <input class="note" type="text" data-note="${it.id}" placeholder="一句话笔记：这课我学到了…"
                  value="${esc(S.notes[it.id] || "")}">
         </div>
