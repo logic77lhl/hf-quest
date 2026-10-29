@@ -1565,7 +1565,8 @@ document.addEventListener("click", async e => {
   if(act === "reset"){
     if(confirm("确定清空所有打卡、进度和笔记？这个操作不可撤销。")){
       localStorage.removeItem(KEY);
-      S.done = {}; S.notes = {}; S.checkins = []; S.acts = {}; S.open = {};
+      S.done = {}; S.doneTs = {}; S.notes = {}; S.noteTs = {};
+      S.checkins = []; S.acts = {}; S.open = {};
       save(); render(); toast("已清空");
     }
     return;
@@ -1597,8 +1598,10 @@ document.getElementById("fileIn").addEventListener("change", e => {
     try{
       const j = JSON.parse(rd.result);
       Object.assign(S, {
-        done: j.done || {}, notes: j.notes || {}, checkins: j.checkins || [],
-        acts: j.acts || {}, base: j.base || S.base, open: j.open || {}
+        done: j.done || {}, doneTs: j.doneTs || {},
+        notes: j.notes || {}, noteTs: j.noteTs || {},
+        checkins: j.checkins || [], acts: j.acts || {},
+        base: j.base || S.base, open: j.open || {}
       });
       save(); render(); toast("导入成功");
     }catch(err){ alert("文件格式不对：" + err.message); }
