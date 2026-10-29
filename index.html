@@ -152,6 +152,11 @@ input[type=search]:focus,input[type=password]:focus{border-color:var(--acc)}
 .item .guide .gb ol{margin:6px 0;padding-left:20px}
 .item .guide .gb li{margin:4px 0}
 .item .guide .gb code{font-family:var(--mono);font-size:11.5px;color:var(--acc)}
+.item .guide .gb ul{margin:8px 0;padding-left:20px}
+.item .guide.ext summary{color:var(--blue)}
+.item .guide.ext summary::before{color:var(--dim2)}
+.item .t .extb{font-size:10px;color:var(--blue);border:1px solid rgba(125,211,252,.35);
+  border-radius:5px;padding:0 4px;margin-left:4px;vertical-align:1px;white-space:nowrap}
 
 /* ── quests ── */
 .qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
@@ -572,6 +577,14 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
 </ol>
 <p><b>真实路径：</b>挑一个你听过的模型，按表格从上到下走一遍，写下三行：它做什么任务、多大、能不能商用。写不出来，就说明还有区域没看。</p>
 <p><b>怎么算过关：</b>给别人介绍这个模型，三句话内说清「干什么、多大、能不能商用」，并且能指出 index 文件在哪。</p>`,
+        xt:"拓展阅读 · 模型卡与权重格式",
+        x:`<p><b>先读官方指南：</b>10 分钟知道 YAML 每个字段是干什么的。</p>
+<ul>
+<li><a href="https://huggingface.co/docs/hub/model-cards" target="_blank" rel="noopener">HF Model Cards 指南</a> —— license / language / base_model / tags 怎么写，eval results 放哪</li>
+<li><a href="https://arxiv.org/abs/1810.03993" target="_blank" rel="noopener">Model Cards for Model Reporting</a> —— 模型卡的原始论文，解释为什么必须写 intended use 和局限</li>
+<li><a href="https://huggingface.co/docs/safetensors/index" target="_blank" rel="noopener">safetensors 文档</a> —— 格式结构、为什么比 pickle 安全、分片怎么工作</li>
+</ul>
+<p><b>读完能回答：</b>一张合格的卡必须有哪些段？safetensors 相比 <code>pytorch_model.bin</code> 解决了什么？index 文件记录的是什么？</p>`,
         l:"/docs/hub/models-the-hub" },
       { id:"l0-4", t:"搞懂 gated 模型与许可证",
         d:"找 2 个 gated 模型、2 个 apache-2.0 模型。验证：判断各自能不能直接商用，写下结论。",
@@ -605,6 +618,46 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
 </ol>
 <p><b>怎么算过关：</b>给你一个模型链接，5 分钟内能回答「我能不能把它放进一个收费产品，需要做什么」。答不上来，就是 LICENSE 没读到关键段落。</p>
 <p style="color:var(--dim2);font-size:12px">这不是法律意见。真要商用，让法务读 LICENSE 原文；中文翻译只作参考。</p>`,
+        xt:"拓展阅读 · 许可证与商用",
+        x:`<p><b>这是一份判断清单，不是法律意见。</b>个人学习、研究、自己玩，下面所有许可基本都允许；真正的分界线是「有没有直接或间接赚钱」——接私活、公司项目、带广告的视频、付费咨询都算商业。</p>
+<p><b>代码 / 软件许可</b></p>
+<div class="gscroll"><table>
+<thead><tr><th>许可</th><th>商用</th><th>要履行的义务</th></tr></thead>
+<tbody>
+<tr><td><b>MIT</b></td><td>可</td><td>保留版权声明和许可文本</td></tr>
+<tr><td><b>Apache-2.0</b></td><td>可</td><td>保留声明和 NOTICE、标注修改、含专利授权</td></tr>
+<tr><td><b>BSD-3</b></td><td>可</td><td>保留声明；不得用作者名背书</td></tr>
+<tr><td><b>MPL-2.0</b></td><td>可</td><td>改过的 MPL 文件要开源，其他文件可闭源</td></tr>
+<tr><td><b>LGPL</b></td><td>可</td><td>动态链接、允许替换库；改库本身要开源</td></tr>
+<tr><td><b>GPL-2/3</b></td><td>可卖，但衍生作品必须 GPL 并提供源码</td><td>不能做成闭源衍生品</td></tr>
+<tr><td><b>AGPL</b></td><td>可卖，但网络服务也要提供源码</td><td>SaaS 也算分发</td></tr>
+</tbody></table></div>
+<p><b>内容 / 数据许可</b></p>
+<div class="gscroll"><table>
+<thead><tr><th>许可</th><th>商用</th><th>条件</th></tr></thead>
+<tbody>
+<tr><td><b>CC0 / Unlicense</b></td><td>可</td><td>无，等同放弃权利</td></tr>
+<tr><td><b>CC BY 4.0</b></td><td>可</td><td>必须署名</td></tr>
+<tr><td><b>CC BY-SA 4.0</b></td><td>可</td><td>署名 + 衍生作品同许可</td></tr>
+<tr><td><b>CC BY-NC 4.0</b></td><td>不可</td><td>个人 / 研究可以；商用要单独授权</td></tr>
+<tr><td><b>CC BY-ND 4.0</b></td><td>可</td><td>不能分发修改版</td></tr>
+</tbody></table></div>
+<p><b>模型专用许可</b></p>
+<div class="gscroll"><table>
+<thead><tr><th>许可</th><th>商用</th><th>关键条件</th></tr></thead>
+<tbody>
+<tr><td><b>Llama 社区许可</b></td><td>可</td><td>月活低于 7 亿；衍生模型命名带 Llama；标注 Built with Llama；遵守使用政策</td></tr>
+<tr><td><b>Gemma Terms</b></td><td>可</td><td>遵守禁止用途清单；Google 保留限制权</td></tr>
+<tr><td><b>OpenRAIL</b></td><td>可</td><td>遵守 Attachment A 的禁止用途；带限制，不算 OSI 开源</td></tr>
+<tr><td><b>Stability 社区许可</b></td><td>年收入低于 100 万美元免费商用，超过要企业许可</td><td>按公司年收入划线</td></tr>
+<tr><td><b>FLUX.1 [dev]</b></td><td>不可</td><td>非商业许可；[schnell] 才是 Apache-2.0</td></tr>
+<tr><td><b>Command R</b></td><td>不可</td><td>权重 CC-BY-NC，商用找 Cohere 授权</td></tr>
+<tr><td><b>Mistral 系列</b></td><td>逐模型看</td><td>7B 是 Apache-2.0；Large 是商业许可；Codestral 是非生产许可</td></tr>
+</tbody></table></div>
+<p><b>读许可证的六个问题：</b>覆盖什么（权重 / 代码 / 数据）→ 能商用吗 → 能改、能再分发吗 → 必须保留什么 → 有专利条款吗 → 有额外限制（用户量 / 命名 / 禁止用途）吗。</p>
+<p><b>商用六步：</b>判定商业使用 → 找齐 LICENSE + 使用政策 + model card → 按类型履行义务 → 分发时带上许可 → 留合规记录（模型、版本、许可、用途、审核人）→ 高风险找法务。</p>
+<p><b>三个坑：</b>tag 不等于 LICENSE；open weights 不等于 open source；微调模型继承底座许可。</p>
+<p><b>资源：</b><a href="https://huggingface.co/docs/hub/repositories-licenses" target="_blank" rel="noopener">HF Licenses 文档</a> · <a href="https://spdx.org/licenses/" target="_blank" rel="noopener">SPDX 许可证列表</a> · <a href="https://choosealicense.com/" target="_blank" rel="noopener">Choose a License</a> · <a href="https://opensource.org/ai/open-source-ai-definition" target="_blank" rel="noopener">OSI 开源 AI 定义</a> · <a href="https://www.licenses.ai/" target="_blank" rel="noopener">RAIL 许可</a> · <a href="https://stability.ai/community-license" target="_blank" rel="noopener">Stability 社区许可</a></p>`,
         l:"/docs/hub/models-gated" },
       { id:"l0-5", t:"掌握搜索语法",
         d:"用 author、pipeline_tag、library、language、num_parameters、sort 组合过滤。验证：用 3 个过滤器组合精准搜到一个模型。",
@@ -678,7 +731,17 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
       { id:"l1-3", t:"配缓存路径（可选镜像）", d:"设 HF_HOME=D:\\dev_cache\\huggingface、HF_HUB_ENABLE_HF_TRANSFER=1；直连慢时再加 HF_ENDPOINT=https://hf-mirror.com。验证：下载不再超时。", l:"/docs/huggingface_hub/guides/download" },
       { id:"l1-4", t:"pipeline 五行跑通", d:"pipeline('sentiment-analysis') 跑一句话。验证：输出 POSITIVE/NEGATIVE 与分数。", l:"/docs/transformers/quicktour" },
       { id:"l1-5", t:"AutoTokenizer + AutoModel 手动加载", d:"不用 pipeline，自己 tokenizer → model(**inputs)。验证：打印出 logits.shape 并解释每个维度。", l:"/docs/transformers/task_summary" },
-      { id:"l1-6", t:"玩生成参数", d:"temperature / top_p / repetition_penalty / max_new_tokens 各调一次。验证：同一 prompt 两次输出不同，且能解释原因。", l:"/docs/transformers/llm_tutorial" },
+      { id:"l1-6", t:"玩生成参数",
+        d:"temperature / top_p / repetition_penalty / max_new_tokens 各调一次。验证：同一 prompt 两次输出不同，且能解释原因。",
+        xt:"拓展阅读 · 采样参数",
+        x:`<p><b>先读：</b>HF 的生成参数可视化文章，比 API 文档直观。</p>
+<ul>
+<li><a href="https://huggingface.co/blog/how-to-generate" target="_blank" rel="noopener">How to generate text</a> —— greedy / beam / sampling 的区别，配图能看懂</li>
+<li><a href="https://arxiv.org/abs/1904.09751" target="_blank" rel="noopener">The Curious Case of Neural Text Degeneration</a> —— top_p 的出处，解释为什么纯采样会跑偏</li>
+<li><a href="https://huggingface.co/docs/transformers/llm_tutorial" target="_blank" rel="noopener">LLM tutorial</a> —— 官方生成参数示例</li>
+</ul>
+<p><b>读完能回答：</b>temperature 和 top_p 分别改什么？为什么同一 prompt 两次输出会不同？</p>`,
+        l:"/docs/transformers/llm_tutorial" },
       { id:"l1-7", t:"整仓下载 snapshot_download", d:"用 allow_patterns 只下需要的文件。验证：说清本地缓存目录结构（models--org--name/snapshots/blobs）。", l:"/docs/huggingface_hub/guides/download" },
       { id:"l1-8", t:"缓存管理与清理", d:"scan_cache_dir() + delete_cache()。验证：清掉至少 1GB，并知道为什么 blobs/snapshots 是硬链接关系。", l:"/docs/huggingface_hub/guides/manage-cache" }
     ]},
@@ -687,7 +750,16 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
     desc:"模型只认 token id。这一层不通，后面所有报错都看不懂。",
     items:[
       { id:"l2-1", t:"单独用 tokenizers", d:"Tokenizer.from_pretrained + encode。验证：能打印 ids / tokens / offsets / attention_mask 四项，并解释 offsets 是干嘛的。", l:"/docs/tokenizers/index" },
-      { id:"l2-2", t:"读懂 tokenizer.json 五部件", d:"Normalizer → PreTokenizer → Model → PostProcessor → Decoder。验证：打开一个 tokenizer.json，指出每段对应哪个部件。", l:"/docs/tokenizers/pipeline" },
+      { id:"l2-2", t:"读懂 tokenizer.json 五部件",
+        d:"Normalizer → PreTokenizer → Model → PostProcessor → Decoder。验证：打开一个 tokenizer.json，指出每段对应哪个部件。",
+        xt:"拓展阅读 · 分词器内部",
+        x:`<ul>
+<li><a href="https://huggingface.co/learn/llm-course/chapter6/1" target="_blank" rel="noopener">LLM Course 第 6 章</a> —— 从零实现 BPE / WordPiece / Unigram，看完就知道三种算法的差别</li>
+<li><a href="https://huggingface.co/docs/tokenizers/index" target="_blank" rel="noopener">tokenizers 文档</a> —— 五部件的 API 和组合方式</li>
+<li><a href="https://huggingface.co/docs/tokenizers/pipeline" target="_blank" rel="noopener">Pipeline 说明</a> —— 一个字符串从原始文本到 id 的完整路径</li>
+</ul>
+<p><b>读完能回答：</b>BPE 和 WordPiece 的合并规则差在哪？中文为什么常被切成多个 token？offsets 为什么对做问答很重要？</p>`,
+        l:"/docs/tokenizers/pipeline" },
       { id:"l2-3", t:"load_dataset + streaming", d:"streaming=True 不落盘。验证：处理一个 >5GB 数据集，硬盘空间没变化。", l:"/docs/datasets/quickstart" },
       { id:"l2-4", t:"数据集卡片与 splits", d:"验证：说清一个数据集的 split 名、字段类型、条数、许可证。", l:"/docs/datasets" },
       { id:"l2-5", t:"map / filter / DataCollator", d:"把文本转成 input_ids 并组 batch。验证：打印 batch 里每个张量的形状，能对上。", l:"/docs/datasets/process" },
@@ -698,10 +770,37 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
     desc:"从跑通 Trainer 到 QLoRA，这是最能出成果的一段。",
     items:[
       { id:"l3-1", t:"Trainer 跑一个文本分类", d:"小数据集 + 小模型。验证：拿到 eval accuracy 数字，不是「跑完了」。", l:"/docs/transformers/training" },
-      { id:"l3-2", t:"LoRA 原理 + PEFT 配置", d:"r / alpha / target_modules。验证：打印可训练参数占比，应该 <1%。", l:"/docs/peft" },
-      { id:"l3-3", t:"QLoRA 4bit 微调", d:"bitsandbytes load_in_4bit + LoRA。验证：单卡 8GB 也能跑起 7B 级模型。", l:"/docs/transformers/quantization/bitsandbytes" },
+      { id:"l3-2", t:"LoRA 原理 + PEFT 配置",
+        d:"r / alpha / target_modules。验证：打印可训练参数占比，应该 <1%。",
+        xt:"拓展阅读 · LoRA 论文与参数",
+        x:`<ul>
+<li><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">LoRA 原论文</a> —— 低秩分解的推导，解释为什么只训一小块也能接近全量微调</li>
+<li><a href="https://huggingface.co/docs/peft/index" target="_blank" rel="noopener">PEFT 文档</a> —— <code>LoraConfig</code> 每个参数的实际含义</li>
+<li><a href="https://huggingface.co/docs/peft/developer_guides/lora" target="_blank" rel="noopener">PEFT LoRA 指南</a> —— target_modules 怎么选，合并权重怎么做</li>
+</ul>
+<p><b>读完能回答：</b>r 和 alpha 各控制什么？为什么常选 q_proj / v_proj？rank 越大越好吗？</p>`,
+        l:"/docs/peft" },
+      { id:"l3-3", t:"QLoRA 4bit 微调",
+        d:"bitsandbytes load_in_4bit + LoRA。验证：单卡 8GB 也能跑起 7B 级模型。",
+        xt:"拓展阅读 · QLoRA 的三个关键设计",
+        x:`<ul>
+<li><a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener">QLoRA 论文</a> —— NF4、double quantization、paged optimizer，三个设计各解决一个问题</li>
+<li><a href="https://huggingface.co/docs/transformers/quantization/bitsandbytes" target="_blank" rel="noopener">bitsandbytes 文档</a> —— <code>load_in_4bit</code> 的实际用法和常见报错</li>
+<li><a href="https://huggingface.co/blog/4bit-transformers-bitsandbytes" target="_blank" rel="noopener">4bit 量化博客</a> —— 图示解释为什么 4bit 还能保住效果</li>
+</ul>
+<p><b>读完能回答：</b>NF4 和普通 INT4 的区别？为什么 4bit 微调效果不明显下降？paged optimizer 解决什么显存问题？</p>`,
+        l:"/docs/transformers/quantization/bitsandbytes" },
       { id:"l3-4", t:"TRL SFTTrainer", d:"用几十条数据做一次 SFT。验证：loss 曲线下降，模型回答风格有变化。", l:"/docs/trl" },
-      { id:"l3-5", t:"DPO 最小跑通", d:"理解 chosen/rejected 配对。验证：能解释 DPO 和 SFT 的目标函数差在哪。", l:"/docs/trl" },
+      { id:"l3-5", t:"DPO 最小跑通",
+        d:"理解 chosen/rejected 配对。验证：能解释 DPO 和 SFT 的目标函数差在哪。",
+        xt:"拓展阅读 · 从 RLHF 到 DPO",
+        x:`<ul>
+<li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">InstructGPT</a> —— RLHF 三步：SFT → reward model → PPO，先有整体图</li>
+<li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">DPO 论文</a> —— 为什么可以跳过 reward model，直接优化策略</li>
+<li><a href="https://huggingface.co/docs/trl/index" target="_blank" rel="noopener">TRL 文档</a> —— <code>DPOTrainer</code> 的数据格式和 beta 参数</li>
+</ul>
+<p><b>读完能回答：</b>DPO 和 SFT 的目标差在哪？chosen / rejected 数据怎么构造？beta 调大调小分别意味着什么？</p>`,
+        l:"/docs/trl" },
       { id:"l3-6", t:"评估与看榜", d:"loss / perplexity / benchmark 三种口径的区别。验证：在 Open LLM Leaderboard 上读懂一列分数。", l:"/spaces/open-llm-leaderboard" },
       { id:"l3-7", t:"训练日志与断点续训", d:"logging_steps / save_steps / resume_from_checkpoint。验证：手动杀掉训练再恢复，不从头开始。", l:"/docs/transformers/trainer" }
     ]},
@@ -709,9 +808,28 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
   { id:"L4", name:"推理与部署 · 让它在别人机器上跑", color:"#fb7185",
     desc:"权重跑得起来 ≠ 服务给得出去。这一段决定你的东西能不能被使用。",
     items:[
-      { id:"l4-1", t:"量化格式辨析", d:"FP16 / INT8 / GPTQ / AWQ / GGUF / EXL2。验证：做一张表，写清每种在什么硬件上跑、精度损失、是否需要校准数据。", l:"/docs/transformers/quantization" },
+      { id:"l4-1", t:"量化格式辨析",
+        d:"FP16 / INT8 / GPTQ / AWQ / GGUF / EXL2。验证：做一张表，写清每种在什么硬件上跑、精度损失、是否需要校准数据。",
+        xt:"拓展阅读 · 量化的三条路线",
+        x:`<ul>
+<li><a href="https://huggingface.co/docs/transformers/quantization/overview" target="_blank" rel="noopener">HF 量化总览</a> —— GPTQ / AWQ / bitsandbytes / GGUF 的官方对照</li>
+<li><a href="https://arxiv.org/abs/2210.17323" target="_blank" rel="noopener">GPTQ 论文</a> —— 用校准数据逐层量化，误差怎么补偿</li>
+<li><a href="https://arxiv.org/abs/2306.00978" target="_blank" rel="noopener">AWQ 论文</a> —— 为什么只保护 1% 的显著权重就够</li>
+<li><a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">llama.cpp</a> —— GGUF 的 Q4_K_M 等命名规则，看 <code>tools/quantize</code></li>
+</ul>
+<p><b>读完能回答：</b>GPTQ、AWQ、GGUF 各适合什么硬件？Q4_K_M 里的 K 和 M 代表什么？为什么量化后显存降了但速度不一定更快？</p>`,
+        l:"/docs/transformers/quantization" },
       { id:"l4-2", t:"llama.cpp / ollama 跑 GGUF", d:"下载一个 Q4_K_M。验证：本地起服务并对话，记录 tokens/s 与显存占用。", l:"https://github.com/ggml-org/llama.cpp" },
-      { id:"l4-3", t:"vLLM 起 OpenAI 兼容服务", d:"vllm serve 后 curl /v1/chat/completions。验证：能用 OpenAI SDK 直接指过去。", l:"https://docs.vllm.ai" },
+      { id:"l4-3", t:"vLLM 起 OpenAI 兼容服务",
+        d:"vllm serve 后 curl /v1/chat/completions。验证：能用 OpenAI SDK 直接指过去。",
+        xt:"拓展阅读 · PagedAttention 与连续批处理",
+        x:`<ul>
+<li><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">PagedAttention 论文</a> —— vLLM 的核心：把 KV cache 像虚拟内存一样分页管理</li>
+<li><a href="https://docs.vllm.ai" target="_blank" rel="noopener">vLLM 文档</a> —— <code>vllm serve</code>、并发参数、显存利用率</li>
+<li><a href="https://blog.vllm.ai/2023/06/20/vllm.html" target="_blank" rel="noopener">vLLM 发布博客</a> —— 和 HuggingFace Transformers 的吞吐对比</li>
+</ul>
+<p><b>读完能回答：</b>KV cache 为什么吃显存？continuous batching 比静态 batching 强在哪？<code>gpu_memory_utilization</code> 调高会发生什么？</p>`,
+        l:"https://docs.vllm.ai" },
       { id:"l4-4", t:"Spaces 建一个 Gradio app", d:"从模板起。验证：拿到公开 URL，手机也能打开。", l:"/docs/hub/spaces-sdks-gradio" },
       { id:"l4-5", t:"Space 里接模型", d:"走 Inference Providers 而不是自己塞权重。验证：改一行代码换供应商，页面仍能跑。", l:"/docs/inference-providers" },
       { id:"l4-6", t:"Inference Endpoints 概念与成本", d:"实例规格、按秒计费、冷启动。验证：估出「7B 模型常驻一个月」大概多少钱，写下来。", l:"/docs/inference-endpoints" },
@@ -722,7 +840,16 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
     desc:"会下载只是消费者。这一段把你变成 Hub 上的生产者。",
     items:[
       { id:"l5-1", t:"用 CLI 上传模型", d:"huggingface-cli login + upload_folder。验证：你的仓库有正确的 Files 列表。", l:"/docs/huggingface_hub/guides/upload" },
-      { id:"l5-2", t:"写规范的 model card", d:"YAML front-matter：license / language / base_model / tags / library_name。验证：页面右侧出现正确的元信息，可被过滤搜到。", l:"/docs/hub/model-cards" },
+      { id:"l5-2", t:"写规范的 model card",
+        d:"YAML front-matter：license / language / base_model / tags / library_name。验证：页面右侧出现正确的元信息，可被过滤搜到。",
+        xt:"拓展阅读 · 模型卡与数据卡",
+        x:`<ul>
+<li><a href="https://arxiv.org/abs/1810.03993" target="_blank" rel="noopener">Model Cards for Model Reporting</a> —— 模型卡该写什么，为什么「局限」比「指标」更重要</li>
+<li><a href="https://arxiv.org/abs/1803.09010" target="_blank" rel="noopener">Datasheets for Datasets</a> —— 数据卡该写什么，和模型卡怎么对应</li>
+<li><a href="https://huggingface.co/docs/hub/model-cards" target="_blank" rel="noopener">HF 模型卡指南</a> —— YAML 字段、eval results 的写法</li>
+</ul>
+<p><b>读完能回答：</b>一张卡里哪几段是必须的？eval results 的 YAML 长什么样？为什么「训练数据」和「局限」不能省？</p>`,
+        l:"/docs/hub/model-cards" },
       { id:"l5-3", t:"加上 eval-results", d:"把评测指标写进 metadata。验证：模型卡里出现可读的指标块。", l:"/docs/hub/model-cards#model-card-metadata" },
       { id:"l5-4", t:"分支、tag 与 revision", d:"用 revision 固定版本，别用 main。验证：两次调用指定不同 revision，拿到不同权重。", l:"/docs/hub/repositories-settings" },
       { id:"l5-5", t:"Token 类型与权限", d:"read / write / fine-grained。验证：为 CI 单独建一个只读 token，并解释为什么不能给 write。", l:"/settings/tokens" },
@@ -731,6 +858,438 @@ model.safetensors.index.json       张量 → 分片的对照表</pre>
       { id:"l5-8", t:"搭一个作品集", d:"3 个 Space + 1 个自己微调的模型 + 完整卡片。验证：把链接发给一个外行，他能看懂你在做什么。", l:"/spaces" }
     ]}
 ];
+
+/* ═══════════════════ 中文导读（L1–L5） ═══════════════════
+   结构统一：一句话 → 关键点 → 常见坑 → 过关标准。
+   写成「读完之后能判断什么」，不重复课程 d 字段的操作步骤。 */
+
+const GUIDES = {
+  "l1-1": { gt:"中文导读 · 让 python 指向你控制得了的那个", g:`<p><b>一句话：</b>装 Python 的目标不是「有 python 命令」，而是知道现在用的是哪一个、包装在哪、坏了怎么重来。</p>
+<ul>
+<li><b>版本要 3.10+。</b>3.9 已逐步被新版本 transformers 放弃，装之前先看目标库的 requires-python。</li>
+<li><b>两条路，选一条。</b><code>uv</code> 一个工具管版本、虚拟环境、装包，快且能锁版本；<code>venv</code> + <code>pip</code> 是标准库自带，依赖最少。别两套混着用。</li>
+<li><b>一个项目一个环境。</b>把包装进系统 Python，早晚会遇到「A 项目升级把 B 项目搞坏」。</li>
+<li><b>Windows 特别注意：</b><code>where python</code> 如果指向 <code>WindowsApps</code>，那是应用商店的占位符，不是真解释器。</li>
+</ul>
+<pre>python -c "import sys, site; print(sys.executable); print(sys.version); print(site.getsitepackages())"</pre>
+<p><b>常见坑：</b>PATH 里有多个 python，装到 A 却跑的是 B；项目路径带中文或空格，某些库直接报错；用管理员权限全局装，后来忘了自己装过什么。</p>
+<p><b>怎么算过关：</b>能说出解释器的绝对路径和 site-packages 位置，能删掉环境从零重建一次，并且 <code>pip list</code> 里没有你解释不了的包。</p>` },
+
+  "l1-2": { gt:"中文导读 · 三件套各管一段", g:`<p><b>一句话：</b>transformers 管模型、datasets 管数据、accelerate 管设备与分布式；torch 是底座，必须单独按显卡装。</p>
+<ul>
+<li><b>先装 torch。</b>去 pytorch.org 按你的 CUDA 版本拿安装命令；直接 <code>pip install torch</code> 很可能给你 CPU 版。</li>
+<li><b>transformers 会带一串间接依赖</b>（tokenizers、huggingface_hub、safetensors、numpy）。不要手动钉这些版本，除非报错明确指向它们。</li>
+<li><b>accelerate</b> 让 <code>device_map="auto"</code> 可用，也是 Trainer 的分布式后端。不装它，很多示例会直接报错。</li>
+<li><b>一条命令验证四件事：</b>版本、CUDA 是否可用、能否 import。</li>
+</ul>
+<pre>python -c "import torch, transformers, datasets, accelerate; print(torch.__version__, torch.cuda.is_available(), transformers.__version__, datasets.__version__)"</pre>
+<p><b>常见坑：</b>装完发现 <code>torch.cuda.is_available()</code> 是 False，其实是 CPU 版；conda 装 torch、pip 装 transformers，两边依赖打架；版本冲突时先乱降 transformers，而不是看清是哪个包要求的。</p>
+<p><b>怎么算过关：</b>上面那条命令一次通过，并且能说出「如果换一台没有 GPU 的机器，哪一行会变成 False、要改什么」。</p>` },
+
+  "l1-3": { gt:"中文导读 · 缓存路径决定 C 盘命运", g:`<p><b>一句话：</b>缓存路径决定你的系统盘会不会爆，也决定断线之后能不能接着下。</p>
+<ul>
+<li><b>HF_HOME 是总根。</b>Hub 模型在 <code>$HF_HOME/hub</code>，数据集在 <code>$HF_HOME/datasets</code>，别再单独设一堆旧变量。</li>
+<li><b>HF_HUB_ENABLE_HF_TRANSFER=1</b> 要先 <code>pip install hf-transfer</code> 才生效；它加速大文件，但个别镜像或代理不支持，报错就先关掉。</li>
+<li><b>HF_ENDPOINT=https://hf-mirror.com</b> 只影响下载。登录、上传、Spaces 仍然走官方站。</li>
+<li><b>环境变量只对新开的终端生效。</b>Windows 用系统设置或 <code>setx</code>，然后在<em>新</em>窗口里验证。</li>
+<li>下完之后目录长这样：<code>models--org--name/{blobs,snapshots,refs}</code>。</li>
+</ul>
+<p><b>常见坑：</b>还在设已弃用的 <code>TRANSFORMERS_CACHE</code>；缓存放在机械盘，加载慢一个数量级；路径里有中文；以为设了镜像就不用登录——gated 模型照样要同意条款。</p>
+<p><b>怎么算过关：</b><code>hf cache scan</code>（旧版是 <code>huggingface-cli scan-cache</code>）能看到刚下的模型，路径确实在你指定的盘上，删掉后空间真的回来了。</p>` },
+
+  "l1-4": { gt:"中文导读 · 五行代码背后的三个选择", g:`<p><b>一句话：</b>pipeline 是「分词器 + 模型 + 后处理」的一条龙，五行能出结果，但它替你做的选择要心里有数。</p>
+<ul>
+<li><b>默认模型是英文小模型。</b>拿它测中文然后说「模型不行」，是最常见的误判；中文任务要显式传 <code>model=</code>。</li>
+<li><b>第一次运行才开始下载。</b>卡住多半是网络，不是代码。</li>
+<li><b>device</b>：<code>-1</code> 是 CPU，<code>0</code> 是第一块 GPU；不传就自动选。</li>
+<li><b>输出是 label + score。</b>分类默认只给 top1，<code>top_k=None</code> 才拿全部分数。</li>
+<li><b>超过模型 max_length 会被截断</b>，BERT 系默认 512 token，长文本要自己切。</li>
+</ul>
+<p><b>常见坑：</b>pipeline 里一次塞太大 batch 导致 OOM；换了本地模型路径却忘了同时换 tokenizer；把 score 当校准过的概率。</p>
+<p><b>怎么算过关：</b>能说出 pipeline 替你做了哪三件事，然后换一个中文模型再跑一次，结果和英文模型对比着解释。</p>` },
+
+  "l1-5": { gt:"中文导读 · 把黑盒拆开看 logits", g:`<p><b>一句话：</b>pipeline 是黑盒，AutoTokenizer + AutoModel 是把盒子拆开——你能看到 logits 的每个维度。</p>
+<ul>
+<li><code>tokenizer(text, return_tensors="pt")</code> 给出 <code>input_ids</code> 和 <code>attention_mask</code>。</li>
+<li><b>AutoModelForSequenceClassification</b> 自带分类头；<b>AutoModel</b> 只出 hidden states，后面要自己接。</li>
+<li>logits 形状是 <code>[batch, seq_len, num_labels]</code>。BERT 系分类通常取 <code>[:, 0, :]</code>（[CLS]），句向量模型则做 mean pooling——<b>别照抄</b>。</li>
+<li>推理要 <code>model.eval()</code> + <code>torch.no_grad()</code>，否则 dropout 还开着、还白算梯度。</li>
+<li>softmax 之后才是概率，logits 本身可以是任意实数。</li>
+</ul>
+<p><b>常见坑：</b>把 hidden_size 当成 num_labels；忘了 attention_mask，padding 也参与 pooling；不同模型的 pooling 方式不同，却用同一段代码。</p>
+<p><b>怎么算过关：</b>打印 logits.shape 并解释三个维度各是什么，再把 logits 变成概率、说出最终 label 和它的分数。</p>` },
+
+  "l1-6": { gt:"中文导读 · 生成参数只改一件事", g:`<p><b>一句话：</b>所有生成参数只改一件事——下一个 token 怎么从概率分布里被选出来。</p>
+<div class="gscroll"><table>
+<thead><tr><th>参数</th><th>改什么</th><th>调大的效果</th></tr></thead>
+<tbody>
+<tr><td><b>temperature</b></td><td>缩放 logits 的陡峭程度</td><td>&gt;1 更随机，&lt;1 更保守，0 接近贪心</td></tr>
+<tr><td><b>top_p</b></td><td>只保留累计概率前 p 的候选</td><td>越小越保守</td></tr>
+<tr><td><b>top_k</b></td><td>只保留概率最高的 k 个</td><td>越大越随机</td></tr>
+<tr><td><b>repetition_penalty</b></td><td>惩罚已出现过的 token</td><td>&gt;1 减少复读，太大语句会崩</td></tr>
+<tr><td><b>max_new_tokens</b></td><td>最多新生成多少 token</td><td>只算新生成，不含输入</td></tr>
+</tbody></table></div>
+<p><b>关键前提：</b><code>do_sample=False</code> 时是贪心解码，temperature 和 top_p <em>都不起作用</em>。很多人调了半天没变化，就是这里错了。</p>
+<p><b>常见坑：</b>同时大改 temperature 和 top_p，说不清是谁的功劳；把 <code>max_length</code> 当新 token 数，结果输出被输入长度挤掉；贪心解码输出重复，却去怪模型。</p>
+<p><b>怎么算过关：</b>固定 seed 复现一次，再解释为什么同一 prompt 默认会给出不同结果，以及 temperature=0 和贪心是什么关系。</p>` },
+
+  "l1-7": { gt:"中文导读 · 下载的是快照，不是文件夹", g:`<p><b>一句话：</b>snapshot_download 下的是「某个 revision 的完整快照」，allow_patterns 是过滤器，不是省流量的魔法。</p>
+<ul>
+<li><b>参数三件套：</b><code>repo_id</code>、<code>revision</code>（分支 / tag / commit sha）、<code>allow_patterns</code>。</li>
+<li><b>allow_patterns 要覆盖全部依赖。</b>只下 <code>*.safetensors</code> 会漏掉 config、tokenizer 和 index，加载时直接报错。</li>
+<li><b>默认落 cache_dir</b>，得到 blobs + snapshots 的链接结构，同一份文件多个 revision 共用。</li>
+<li><b>local_dir 是另一份独立目录</b>，会额外占空间；想要「干净目录」就用它，想要省空间就用缓存。</li>
+<li>动手前先看 Files 列表，确认要哪几个文件，别整仓拖。</li>
+</ul>
+<p><b>常见坑：</b>漏了 <code>model.safetensors.index.json</code>；下 GGUF 分片只下了第一片；实验用 <code>main</code>，两周后复现不了。</p>
+<p><b>怎么算过关：</b>说清 blobs 和 snapshots 的关系，并且只下某一个 Q4_K_M 的 GGUF，目录里没有多余文件。</p>` },
+
+  "l1-8": { gt:"中文导读 · 缓存是内容寻址的", g:`<p><b>一句话：</b>缓存不是「一个模型一个文件夹」，而是「内容寻址的 blob + 指向它的快照」，所以删之前要先算引用。</p>
+<ul>
+<li><b>scan_cache_dir()</b> 给出每个 repo / revision 实际占多少，以及哪些 blob 被共用。</li>
+<li><b>delete_cache()</b> 按 revision 删；共用的 blob 要等最后一个引用消失才真正释放。</li>
+<li><b>新版 CLI：</b><code>hf cache scan</code> / <code>hf cache delete</code>；旧版是 <code>huggingface-cli scan-cache</code> / <code>delete-cache</code>。</li>
+<li><b>手动删目录一般不会坏事</b>，但 refs 里会留下死指针，下次加载会重新下。</li>
+</ul>
+<p><b>常见坑：</b>以为删掉 snapshots 就释放了空间，其实 blobs 还在；删了另一个项目正在用的 revision；训练中途清缓存。</p>
+<p><b>怎么算过关：</b>清掉至少 1GB，并解释「为什么删了一个 revision，磁盘占用不一定立刻下降」。</p>` },
+
+  "l2-1": { gt:"中文导读 · tokenizer 的四个输出", g:`<p><b>一句话：</b>tokenizer 把字符串变成 id 数组，同时告诉你每个 token 在原文的哪一段。</p>
+<ul>
+<li><b>ids</b>：模型真正吃进去的整数序列。</li>
+<li><b>tokens</b>：切出来的子词，用来理解「为什么这个中文词被切成三块」。</li>
+<li><b>offsets</b>：每个 token 对应原文的 <code>(start, end)</code> 字符区间。抽取式问答靠它把答案映射回原文。</li>
+<li><b>attention_mask</b>：区分真实 token 和 padding，padding 位置不参与注意力。</li>
+<li><code>decode(skip_special_tokens=True)</code> 把 id 还原成文本，检查有没有多出特殊符号。</li>
+</ul>
+<p><b>常见坑：</b>把 token 数当字数，中文尤其离谱（一个汉字可能 1–3 个 token）；把 offsets 当成字节偏移；忘了 special tokens，长度总比预期多 2。</p>
+<p><b>怎么算过关：</b>四项都打印出来，并解释 offsets 在「从长文档里抽答案」时具体怎么用。</p>` },
+
+  "l2-2": { gt:"中文导读 · tokenizer.json 是一份流水线配置", g:`<p><b>一句话：</b>tokenizer.json 不是一个词表，是一条流水线的配置：文本进来，经过五段，变成 id。</p>
+<div class="gscroll"><table>
+<thead><tr><th>部件</th><th>干什么</th><th>典型配置</th></tr></thead>
+<tbody>
+<tr><td><b>Normalizer</b></td><td>统一字符形态</td><td>NFKC、小写、去重音</td></tr>
+<tr><td><b>PreTokenizer</b></td><td>先粗切成片段</td><td>按空格、按字节（ByteLevel）</td></tr>
+<tr><td><b>Model</b></td><td>真正的子词算法</td><td>BPE / WordPiece / Unigram</td></tr>
+<tr><td><b>PostProcessor</b></td><td>加特殊 token、套模板</td><td>[CLS]/[SEP]、TemplateProcessing</td></tr>
+<tr><td><b>Decoder</b></td><td>id 还原成文本</td><td>ByteLevel、WordPiece</td></tr>
+</tbody></table></div>
+<p>另外还有一段 <code>added_tokens</code>，放 <code>&lt;pad&gt;</code>、<code>&lt;|im_start|&gt;</code> 这类后来加进去的 token，它们不在原始词表里。</p>
+<p><b>常见坑：</b>拿 vocab 大小当文件里的 tokens 数组长度（漏算 added_tokens）；SentencePiece 模型用的是 <code>tokenizer.model</code>，不是 json；改了 normalizer 却没重训，训练和推理不一致。</p>
+<p><b>怎么算过关：</b>打开一个真实的 tokenizer.json，指出五段各在哪，并说出这个模型用的是哪种 subword 算法。</p>` },
+
+  "l2-3": { gt:"中文导读 · streaming 是「不下载完」", g:`<p><b>一句话：</b>streaming 不是「下载更快」，是「根本不下载完」——你拿到的是一个只能往前走的迭代器。</p>
+<ul>
+<li><code>load_dataset(..., streaming=True)</code> 返回 IterableDataset，不是 Dataset。</li>
+<li><b>不能 len()、不能 ds[0]、不能全量 shuffle。</b>要打乱只能用 <code>shuffle(buffer_size=1000)</code> 做局部缓冲。</li>
+<li><code>take</code> / <code>skip</code> / <code>filter</code> 都是惰性的，写上去不会立刻执行。</li>
+<li><b>迭代器只能走一次。</b>要第二轮就重新 load，或者自己缓存中间结果。</li>
+<li>适合「比内存还大」的语料：边流边统计、边流边写。</li>
+</ul>
+<p><b>常见坑：</b>以为 streaming 就不占内存（buffer 和 batch 都要）；<code>num_proc</code> 在流式下无效；把同一个 iterable 传给两个消费者，第二个拿到空。</p>
+<p><b>怎么算过关：</b>处理一个 &gt;5GB 的数据集，硬盘占用不变，内存有峰值但可控，并且能说出峰值来自哪里。</p>` },
+
+  "l2-4": { gt:"中文导读 · 先看 split、字段、许可", g:`<p><b>一句话：</b>数据集页面上的三样东西决定你能不能直接用——split 名、字段类型、许可证。</p>
+<ul>
+<li><b>splits</b>：常见 train / validation / test，但名字不一定标准，也有 <code>train_sft</code> 这种。代码里写死 <code>"train"</code> 很容易挂。</li>
+<li><b>features</b>：字段名和类型（string、int64、ClassLabel）。类型决定 collator 怎么处理。</li>
+<li><b>YAML</b>：license、language、task_categories、size_categories，决定它能不能被筛到、能不能商用。</li>
+<li><b>viewer 依赖 parquet 转换</b>，转换失败就看不到预览，但数据本身可能没问题。</li>
+<li><b>gated 数据集</b>要先去页面同意条款，否则 load 时报 401/403。</li>
+</ul>
+<p><b>常见坑：</b>用 test 集调参，最后分数虚高；不看 license 就放进产品；只看条数不看去重和语言分布。</p>
+<p><b>怎么算过关：</b>随手打开一个数据集，说出它的 split 名、字段、条数、许可证四项，不用回头查。</p>` },
+
+  "l2-5": { gt:"中文导读 · map 改内容，collator 定形状", g:`<p><b>一句话：</b>map 改内容，filter 减行，DataCollator 决定一个 batch 长什么样。</p>
+<ul>
+<li><code>map(batched=True, batch_size=1000)</code> 比逐条快很多，还能一次处理整批文本。</li>
+<li><code>remove_columns</code> 去掉原始文本列，省内存，也避免 collator 收到意外字段。</li>
+<li><b>DataCollatorWithPadding</b> 动态 pad 到 batch 内最长，比统一 pad 到 512 省显存。</li>
+<li><b>因果语言模型的 labels 就是 input_ids</b>，模型内部会做 shift，不用自己错位。</li>
+<li><code>set_format("torch")</code> 之后拿到的才是张量。</li>
+</ul>
+<p><b>常见坑：</b>pad 到全局 max_length，一半算力花在 padding 上；不知道 labels 里的 -100 会被 loss 忽略（这是特性，用来屏蔽 prompt）；map 之后列名和模型输入对不上。</p>
+<p><b>怎么算过关：</b>打印一个 batch 里每个张量的形状，逐个说出它对应模型的哪个输入。</p>` },
+
+  "l2-6": { gt:"中文导读 · 上传是为了让别人一行加载", g:`<p><b>一句话：</b>上传数据集不是传文件，是让别人能一行 <code>load_dataset</code> 就跑起来。</p>
+<ul>
+<li>建 <b>dataset 类型</b>的仓库，不是 model。</li>
+<li>传 parquet / csv / json；新版 viewer 会自动转换成 parquet 做预览。</li>
+<li><b>README 的 YAML 要写</b>：license、language、task_categories、configs（多配置时）。</li>
+<li><code>push_to_hub</code> 或 <code>hf upload --repo-type dataset</code>。</li>
+<li>大文件自动走 LFS，不要手动改 <code>.gitattributes</code>。</li>
+</ul>
+<p><b>常见坑：</b>只传 CSV 没写 split/config，viewer 认不出结构；私有仓库别人加载要 token；没写许可证，别人不敢用；传了原始数据却没说明字段含义。</p>
+<p><b>怎么算过关：</b>换一个没登录的环境（或让朋友）能 <code>load_dataset("你的名字/数据集")</code> 成功，并且看得到预览。</p>` },
+
+  "l3-1": { gt:"中文导读 · Trainer 需要你给四样东西", g:`<p><b>一句话：</b>Trainer 封装了训练循环，但模型、数据、评估方法、保存策略这四样必须你给。</p>
+<ul>
+<li><b>TrainingArguments</b> 里最常改：<code>output_dir</code>、batch size、learning rate、epochs、<code>eval_strategy</code>、<code>save_strategy</code>、<code>logging_steps</code>。</li>
+<li><b>compute_metrics 不传，就只有 loss</b>，没有 accuracy / F1。想要数字必须自己写函数。</li>
+<li><b>小数据集先跑 1 个 epoch</b>，确认链路通了再谈效果。</li>
+<li>CPU 只适合极小模型和极短数据，别拿它跑 7B。</li>
+</ul>
+<p><b>常见坑：</b>旧教程写 <code>evaluation_strategy</code>，新版已改名 <code>eval_strategy</code>，直接报参数错误；忘了传 tokenizer / processing_class，padding 报错；batch 太大 OOM，却以为模型放不下。</p>
+<p><b>怎么算过关：</b>拿到一个真实的 eval accuracy，能说出它是在哪个 split、多少条数据上算的。</p>` },
+
+  "l3-2": { gt:"中文导读 · LoRA 只学「变化量」", g:`<p><b>一句话：</b>LoRA 不训练原权重，只训练两个小矩阵，把「权重的变化量」用低秩近似表示。</p>
+<ul>
+<li>原权重冻结；A 把维度降到 r，B 再升回去，输出乘上 <code>alpha/r</code>。</li>
+<li><b>r 控制容量</b>，常用 8–64；<b>alpha 控制更新强度</b>，常取 r 的 1–2 倍。</li>
+<li><b>target_modules</b> 常选 <code>q_proj/k_proj/v_proj/o_proj</code>，想省事可以用 all-linear。</li>
+<li>可训练参数通常 &lt;1%，adapter 只有几十 MB，好传好存。</li>
+<li><code>merge_and_unload()</code> 可以把 adapter 合回底座，得到一个普通模型。</li>
+</ul>
+<p><b>常见坑：</b>只训 q、v 效果不够就怪 LoRA（可以先加 k、o 或 all-linear）；学习率照搬全量微调（LoRA 通常用 1e-4 量级）；保存了 adapter 却当完整模型加载。</p>
+<p><b>怎么算过关：</b>打印可训练参数占比，并解释「r 调大」和「alpha 调大」分别会让模型发生什么变化。</p>` },
+
+  "l3-3": { gt:"中文导读 · QLoRA 用精度换显存", g:`<p><b>一句话：</b>QLoRA = 底座 4bit 冻结 + LoRA 训练，用一点精度换大量显存，让单卡能碰大模型。</p>
+<ul>
+<li><b>NF4</b>：按正态分布的分位数切桶，比均匀 INT4 更贴合权重分布。</li>
+<li><b>double quantization</b>：把量化常数再量化一次，每参数再省约 0.37 bit。</li>
+<li><b>paged optimizer</b>：显存尖峰时把优化器状态换到 CPU，避免 OOM。</li>
+<li>代码路径：<code>prepare_model_for_kbit_training</code> → <code>LoraConfig</code> → <code>get_peft_model</code>。</li>
+<li>计算 dtype 用 bf16，别用 fp16 硬扛。</li>
+</ul>
+<p><b>常见坑：</b>8GB 跑 7B 是极限——短序列、batch=1、开梯度检查点才勉强，3B 以下才舒服；以为量化底座能直接 merge 成 fp16 继续全量训；Windows 上优先装官方 wheel，老教程替换 dll 的方案已过时。</p>
+<p><b>怎么算过关：</b>跑通一次，能说出 NF4、双量化、paged optimizer 各解决哪个具体问题。</p>` },
+
+  "l3-4": { gt:"中文导读 · SFT 的关键是「套对模板」", g:`<p><b>一句话：</b>SFTTrainer 只多做一件事——把你的「指令-回答」样本套成模型认识的对话格式，然后只对回答算 loss。</p>
+<ul>
+<li><b>数据三种写法</b>：instruction/input/output、messages（role/content）、纯 text。</li>
+<li><b>chat_template</b> 决定 <code>&lt;|user|&gt;</code>、<code>&lt;|assistant|&gt;</code> 这些标记怎么加。用错模板，等于教模型一种它没见过的格式。</li>
+<li><b>packing</b> 把短样本拼满，提升吞吐，但要处理好 EOS，别让两条样本串味。</li>
+<li><b>completion_only_loss</b> 只对回答部分计 loss，prompt 部分不计。</li>
+<li>新版把训练参数收进 <code>SFTConfig</code>，旧教程的字段名可能已经换了。</li>
+</ul>
+<p><b>常见坑：</b>不套模板直接训，模型学不到轮次；数据里有空回答；几十条数据就期待质变——SFT 改的是风格和格式，不是知识。</p>
+<p><b>怎么算过关：</b>loss 下降，回答风格有可见变化，并且能指出「哪一段 token 被算了 loss」。</p>` },
+
+  "l3-5": { gt:"中文导读 · DPO 跳过奖励模型", g:`<p><b>一句话：</b>DPO 把「人类偏好」直接变成损失函数，跳过奖励模型和 PPO。</p>
+<ul>
+<li>数据是 <code>(prompt, chosen, rejected)</code> 三元组。</li>
+<li>目标：提高 chosen 相对 rejected 的概率，同时被 <b>beta</b> 拉住，不偏离参考模型太远。</li>
+<li><b>beta 越大越保守</b>（更接近 SFT 模型），越小越敢偏离，但可能退化。</li>
+<li>参考模型默认是训练前的 policy 副本，不传 <code>ref_model</code> 也行。</li>
+<li><b>DPO 之前必须先 SFT</b>，否则起点太差，偏好对学不动。</li>
+</ul>
+<p><b>常见坑：</b>chosen 明显比 rejected 长，模型学会「越长越好」；beta 太小，输出变得啰嗦或跑偏；偏好对本身质量差，训完更差。</p>
+<p><b>怎么算过关：</b>说清 DPO 和 SFT 的目标函数差在哪，以及 beta 调大调小分别意味着什么。</p>` },
+
+  "l3-6": { gt:"中文导读 · 三把尺子不能混着比", g:`<p><b>一句话：</b>loss、perplexity、benchmark 是三把不同的尺子，别拿一把的读数去比另一把。</p>
+<div class="gscroll"><table>
+<thead><tr><th>指标</th><th>测什么</th><th>能不能跨模型比</th></tr></thead>
+<tbody>
+<tr><td><b>loss</b></td><td>token 级交叉熵，拟合训练分布的程度</td><td>只能同 tokenizer、同数据比</td></tr>
+<tr><td><b>perplexity</b></td><td>exp(loss)，模型对文本的「困惑度」</td><td>tokenizer 不同就不可比</td></tr>
+<tr><td><b>benchmark</b></td><td>任务级准确率 / 通过率</td><td>要看 prompt、few-shot、解析方式</td></tr>
+</tbody></table></div>
+<ul>
+<li><b>看榜先看三件事</b>：评测配置、发布日期、分数是自报还是第三方复现。</li>
+<li>原来的 Open LLM Leaderboard 已经归档，链接可能跳到只读页；现在更多看任务专项榜和竞技场式对比。</li>
+<li>榜单会被刷分，也会被数据污染，别把排名当能力上限。</li>
+</ul>
+<p><b>常见坑：</b>跨 tokenizer 比 perplexity；拿一个 benchmark 分数推断「通用能力」；忽略 few-shot 设置不同。</p>
+<p><b>怎么算过关：</b>在榜上读懂一列分数，能说出它测什么任务、用什么数据、分数怎么算出来的。</p>` },
+
+  "l3-7": { gt:"中文导读 · 续训靠的不是权重", g:`<p><b>一句话：</b>断点续训能成立，靠的不是模型权重，而是优化器状态 + 学习率调度器 + 随机数状态。</p>
+<ul>
+<li><code>checkpoint-500/</code> 里除了模型，还有 <code>optimizer.pt</code>、<code>scheduler.pt</code>、<code>rng_state</code>、<code>trainer_state.json</code>。</li>
+<li><code>Trainer.train(resume_from_checkpoint=True)</code> 会自动找最新的 checkpoint。</li>
+<li><code>save_steps</code> 决定粒度，<code>save_total_limit</code> 控制占盘。</li>
+<li><code>logging_steps</code> 只影响日志频率，不影响保存。</li>
+</ul>
+<p><b>常见坑：</b>只备份了模型文件，续训等于重新开始；<code>save_steps</code> 太小，IO 把训练拖慢；<code>overwrite_output_dir</code> 把旧 checkpoint 清了。</p>
+<p><b>怎么算过关：</b>训练中手动 kill 进程，再恢复，step 从断点继续而不是从 0 开始，loss 曲线接得上。</p>` },
+
+  "l4-1": { gt:"中文导读 · 量化格式是给引擎用的", g:`<p><b>一句话：</b>量化格式不是「压缩格式」，是「为不同推理引擎准备的权重布局」。</p>
+<div class="gscroll"><table>
+<thead><tr><th>格式</th><th>跑在哪</th><th>要不要校准</th><th>典型用途</th></tr></thead>
+<tbody>
+<tr><td><b>FP16 / BF16</b></td><td>GPU</td><td>不用</td><td>基准、训练</td></tr>
+<tr><td><b>INT8 (bitsandbytes)</b></td><td>GPU</td><td>基本不用</td><td>快速省显存</td></tr>
+<tr><td><b>GPTQ</b></td><td>GPU</td><td>要</td><td>4bit 部署</td></tr>
+<tr><td><b>AWQ</b></td><td>GPU</td><td>要</td><td>4bit 部署，保护显著通道</td></tr>
+<tr><td><b>GGUF</b></td><td>CPU / 混合</td><td>要</td><td>llama.cpp、Ollama</td></tr>
+<tr><td><b>EXL2</b></td><td>GPU</td><td>要</td><td>ExLlamaV2，可变 bit</td></tr>
+</tbody></table></div>
+<p><b>Q4_K_M 怎么读：</b>4bit、K-quant 分块量化、M 是 medium 混合精度。同是 4bit，Q4_0 和 Q4_K_M 的体积与质量都不同。</p>
+<p><b>常见坑：</b>以为量化模型还能直接全量训练（只有 QLoRA 这类适配方案可以）；把 GGUF 塞给 transformers；只看 bit 数不看算法。</p>
+<p><b>怎么算过关：</b>一张表写清每种格式的硬件、精度损失、是否需要校准数据，并能给一个具体场景选对格式。</p>` },
+
+  "l4-2": { gt:"中文导读 · GGUF 与 Ollama 的分工", g:`<p><b>一句话：</b>GGUF 是给 llama.cpp 的单文件格式，Ollama 是它上面的一层「模型管理 + 服务」。</p>
+<ul>
+<li><b>先从 Q4_K_M 起步</b>，体积和质量比较平衡；下分片模型时要把 <code>00001-of-00002</code> 全部下完。</li>
+<li><code>llama-server -m model.gguf -c 4096 --n-gpu-layers N</code> 起一个本地服务。</li>
+<li><b>n_gpu_layers</b> 决定多少层放显卡，剩下的跑在 CPU；层数拉满会 OOM。</li>
+<li><b>Ollama 用 Modelfile 封装</b>，模型名和 HF 仓库名不是一回事，别照着 repo 名 <code>ollama run</code>。</li>
+</ul>
+<p><b>常见坑：</b>上下文默认很小，长文被悄悄截断；以为 GGUF 能在 GPU 上飞快——它更擅长 CPU / 混合；只下第一片分片。</p>
+<p><b>怎么算过关：</b>本地起服务完成一次对话，记录 tokens/s 和显存占用，并解释「为什么层数不能拉满」。</p>` },
+
+  "l4-3": { gt:"中文导读 · vLLM 快在哪", g:`<p><b>一句话：</b>vLLM 的快来自两件事——KV cache 分页管理，和请求级别的连续批处理。</p>
+<ul>
+<li><b>PagedAttention</b> 把 KV cache 切成固定大小的块，按需分配，减少显存碎片和浪费。</li>
+<li><b>continuous batching</b>：一个请求结束立刻换下一个，不等整批跑完。</li>
+<li><code>vllm serve org/model</code> 起一个 OpenAI 兼容的 <code>/v1</code> 服务。</li>
+<li><code>gpu_memory_utilization</code> 默认 0.9，控制预分配比例；<code>max-model-len</code> 直接决定 KV cache 上限。</li>
+</ul>
+<p><b>常见坑：</b>显存不够时先降 <code>max-model-len</code>，而不是先降 batch；<code>tensor_parallel_size</code> 与注意力头数不整除会报错；模型架构不被支持，先查文档。</p>
+<p><b>怎么算过关：</b>用 OpenAI SDK 直接指过去，连续发两个请求都成功，并能说出吞吐比 transformers 高的原因。</p>` },
+
+  "l4-4": { gt:"中文导读 · Space 是仓库加容器", g:`<p><b>一句话：</b>Space 是一个 git 仓库 + 一个自动构建的容器，Gradio 只是其中一种 SDK。</p>
+<ul>
+<li>README 的 YAML 决定怎么跑：<code>sdk: gradio</code>、<code>app_file</code>、<code>sdk_version</code>。</li>
+<li><code>requirements.txt</code> 要锁版本，否则几天后重建可能挂。</li>
+<li>端口用 <b>7860</b>（Gradio 默认），别写死 localhost 路径。</li>
+<li><b>免费额度现状：</b>Static Space 免费；Gradio / Docker 需 PRO；免费账号最多 2 个 ZeroGPU Gradio Space。</li>
+<li>提交后自动 build，构建日志就在页面上，报错先看那里。</li>
+</ul>
+<p><b>常见坑：</b>写死本地文件路径；不锁依赖；把 API key 写进 <code>app.py</code>——public Space 的源码所有人可见。</p>
+<p><b>怎么算过关：</b>拿到公开 URL，手机能打开并完成一次交互，构建日志没有警告。</p>` },
+
+  "l4-5": { gt:"中文导读 · Space 里别自己塞权重", g:`<p><b>一句话：</b>Space 里接模型，优先走 Inference Providers——你的页面只负责界面，推理发生在别人机器上。</p>
+<ul>
+<li>统一走 OpenAI 兼容入口，换供应商通常只改模型名或 provider 参数。</li>
+<li><b>用 HF token</b>，放 Settings → Secrets，不要写进代码。</li>
+<li>免费额度有限，会限流；请求要设超时和重试。</li>
+<li>不同 provider 支持的模型不一样，先查可用列表再写代码。</li>
+<li>冷启动和排队要显示给用户，否则会被当成「坏了」。</li>
+</ul>
+<p><b>常见坑：</b>token 硬编码进 <code>app.py</code>；选的模型没有 provider 支持；把一次超时当成模型不可用。</p>
+<p><b>怎么算过关：</b>改一行换一个供应商，页面仍然能跑，并且能说出请求实际发到了哪里。</p>` },
+
+  "l4-6": { gt:"中文导读 · Endpoints 按「跑多久」计费", g:`<p><b>一句话：</b>Endpoints 卖的是「常驻的专用实例」，不是「按调用次数」；成本要从「跑多久」算，不是「调几次」。</p>
+<ul>
+<li>要选：实例规格（CPU/GPU、显存）、副本数、autoscaling 策略。</li>
+<li><b>scale-to-zero</b> 后不再产生计算费用，但下次请求要等冷启动。</li>
+<li>成本 ≈ 小时单价 × 每月运行小时 × 副本数；网络出口和存储另算。</li>
+<li>7B 单卡 A10G 级别常驻一个月是几百美元量级；按需启停能省一个数量级。</li>
+<li>具体单价以官方定价页为准，别用半年前的数字做预算。</li>
+</ul>
+<p><b>常见坑：</b>demo 用完忘了关；按峰值配副本；把「能跑」的 demo 直接放 Endpoints，成本远高于 Space。</p>
+<p><b>怎么算过关：</b>写出「7B 常驻一个月」的估算，标明单价、小时数、副本数三个假设。</p>` },
+
+  "l4-7": { gt:"中文导读 · 显存要分四块算", g:`<p><b>一句话：</b>显存 = 权重 + KV cache + 激活 + 框架开销，前三项能算，最后一项只能留余量。</p>
+<pre>权重      = 参数量 × 每参数字节（fp16 2 / int8 1 / 4bit 0.5）
+KV cache  = 2 × 层数 × KV头数 × head_dim × 序列长 × 并发 × 字节
+激活      ≈ batch × 序列长 × hidden × 层数 × 系数（训练远大于推理）</pre>
+<ul>
+<li><b>7B fp16 权重约 14GB</b>，4bit 约 3.5–4GB。</li>
+<li><b>Llama-2-7B 每 token 的 KV 约 0.5MB</b>：32 层 × 32 头 × 128 维 × 2（K/V）× 2 字节。4k 上下文一条就要约 2GB。</li>
+<li>GQA 模型 KV 头数远小于注意力头数，<b>别拿总头数算</b>。</li>
+<li>留 10–20% 给碎片和临时缓冲。</li>
+</ul>
+<p><b>常见坑：</b>只算权重，一上并发就 OOM；把训练估算套到推理；忽略框架自身占用。</p>
+<p><b>怎么算过关：</b>不跑代码，算出目标卡上「这个模型、这个上下文长度」能撑几个并发，再上机验证误差。</p>` },
+
+  "l5-1": { gt:"中文导读 · 上传是一次 git 提交", g:`<p><b>一句话：</b>上传不是「传文件」，是「往一个 git 仓库提交一个版本」。</p>
+<ul>
+<li>先登录：新版 <code>hf auth login</code>，旧版 <code>huggingface-cli login</code>。</li>
+<li>仓库可以先用 <code>create_repo</code> 建，也可以上传时自动建。</li>
+<li><code>hf upload &lt;repo&gt; &lt;local_dir&gt; --repo-type model</code>；数据集记得改成 <code>dataset</code>。</li>
+<li>大文件自动走 LFS，别手动改 <code>.gitattributes</code>。</li>
+<li>传完看 Files 列表和 commit 历史，确认文件齐、版本对。</li>
+</ul>
+<p><b>常见坑：</b>repo_type 写错，权重传到 dataset 仓库；只传了权重，没传 config / tokenizer；用网页拖拽传大文件，断了要重来。</p>
+<p><b>怎么算过关：</b>仓库 Files 列表完整，另一个环境能 <code>from_pretrained("你的名字/模型")</code> 直接加载。</p>` },
+
+  "l5-2": { gt:"中文导读 · 卡片是给陌生人的说明书", g:`<p><b>一句话：</b>model card 是「给陌生人的使用说明书」：YAML 决定它能不能被搜到，正文决定别人敢不敢用。</p>
+<ul>
+<li><b>YAML</b>：license、language、base_model、library_name、tags、datasets。</li>
+<li><b>正文</b>：用途、训练数据、评测方法与结果、局限、伦理、引用。</li>
+<li><b>base_model</b> 指向底座，许可证通常跟着底座走。</li>
+<li>放一段能直接跑的最小示例，比写十行「效果优秀」有用。</li>
+<li>「局限」不是减分项，是可信度。</li>
+</ul>
+<p><b>常见坑：</b>YAML 里的值含冒号却没加引号，整段解析失败；tags 拼错不报错，但筛选器搜不到；只写结论不写评测方法。</p>
+<p><b>怎么算过关：</b>页面右侧元信息正确，用筛选器能搜到你的模型，别人照示例能跑出结果。</p>` },
+
+  "l5-3": { gt:"中文导读 · 把分数写成机器可读的", g:`<p><b>一句话：</b>eval-results 是把分数写成机器可读的 YAML，让 Hub 自动渲染成表格。</p>
+<pre>model-index:
+- name: 你的模型
+  results:
+  - task:
+      type: text-classification
+    dataset:
+      name: 数据集名
+      type: 你的名字/数据集
+    metrics:
+    - name: Accuracy
+      type: accuracy
+      value: 0.92</pre>
+<ul>
+<li>metric type 用标准名：accuracy、f1、precision、recall、wer 等。</li>
+<li><code>verified: true</code> 表示结果可复现，别随便加。</li>
+<li>缩进错一格，整块就不显示。</li>
+</ul>
+<p><b>常见坑：</b>把分数写进正文却没进 YAML，筛选和排行榜都读不到；task type 不在白名单；多数据集时 results 结构写错。</p>
+<p><b>怎么算过关：</b>模型卡里出现可读的指标块，点 dataset 能跳到对应数据集。</p>` },
+
+  "l5-4": { gt:"中文导读 · revision 是时间机器", g:`<p><b>一句话：</b>revision 是「时间机器」——branch 会动，tag 和 commit sha 不会。</p>
+<ul>
+<li><code>main</code> 是默认分支，随时会变。</li>
+<li><b>tag</b> 适合发版，<b>commit sha</b> 最精确。</li>
+<li><code>from_pretrained(..., revision="v1.0")</code> 固定版本。</li>
+<li>PR 会生成 <code>refs/pr/N</code> 的临时 revision，可以用来在合并前测试。</li>
+<li>大文件历史很难删，发版前想清楚。</li>
+</ul>
+<p><b>常见坑：</b>实验记录只写 main，回头复现不了；tag 打完又 force push；拿分支名当版本号。</p>
+<p><b>怎么算过关：</b>两次调用指定不同 revision，拿到不同权重，并能解释为什么实验结果要绑定 revision。</p>` },
+
+  "l5-5": { gt:"中文导读 · token 是钥匙，不是密码", g:`<p><b>一句话：</b>token 是「给程序的钥匙」，不是密码；权限只给到任务需要的那一档。</p>
+<div class="gscroll"><table>
+<thead><tr><th>类型</th><th>能做什么</th><th>用在哪</th></tr></thead>
+<tbody>
+<tr><td><b>read</b></td><td>下载、读私有仓库</td><td>推理服务、CI 拉模型</td></tr>
+<tr><td><b>write</b></td><td>上传、改仓库、删文件</td><td>只在你自己的发布流程里</td></tr>
+<tr><td><b>fine-grained</b></td><td>限定具体 repo 和操作</td><td>多人协作、最小权限</td></tr>
+</tbody></table></div>
+<ul>
+<li>CI 用只读 token，放 Secrets，不要放代码仓库。</li>
+<li>泄露立刻 revoke，不是改密码——token 是独立凭证。</li>
+<li>token 不能用来登录网页，它只给 API / CLI 用。</li>
+</ul>
+<p><b>常见坑：</b>把 token 写进 notebook 或 <code>app.py</code>；CI 里用 write token；一个 token 到处复用，出事无法定位。</p>
+<p><b>怎么算过关：</b>为 CI 建一个只读 token，能说出它最坏情况下能造成的损失。</p>` },
+
+  "l5-6": { gt:"中文导读 · 复现不是跑通 demo", g:`<p><b>一句话：</b>复现论文不是「跑通 demo」，是「在别人的机器上也能得到同样的结论」。</p>
+<ul>
+<li>从 <code>/papers</code> 找带 model / dataset / space 的，优先选有官方实现的。</li>
+<li>先跑推理，再谈训练；优先选 &lt;10B 或带 GGUF 的，门槛低。</li>
+<li>记录：环境、显存、耗时、评测配置，缺一项就无法复现。</li>
+<li>看官方仓库的最近 commit 和 issue，半年没维护的要小心。</li>
+</ul>
+<p><b>常见坑：</b>论文代码依赖已删；数据 gated 或已下架；分数差异其实来自 prompt 和解析方式，不是模型。</p>
+<p><b>怎么算过关：</b>跑通一次，写三行：它解决什么、我怎么用、我卡在哪一步。</p>` },
+
+  "l5-7": { gt:"中文导读 · 提问也是贡献", g:`<p><b>一句话：</b>社区贡献的最小单位不是 PR，是一个「别人能照着复现」的问题描述。</p>
+<ul>
+<li><b>提问带四样</b>：版本、完整命令、完整报错、最小复现。</li>
+<li><b>Discussions</b> 适合开放问题，<b>Issue</b> 适合 bug，别投错地方。</li>
+<li><b>PR 小而专</b>，别混入格式化改动，reviewer 看不出你改了什么。</li>
+<li>回答别人时给链接和可运行代码，不给「我觉得」。</li>
+</ul>
+<p><b>常见坑：</b>只贴截图不贴文本；一次 @ 好几个维护者；PR 改了无关文件；不说明环境，别人无法判断。</p>
+<p><b>怎么算过关：</b>拿到一个真实回复，或者一个被 merge 的小 PR。</p>` },
+
+  "l5-8": { gt:"中文导读 · 作品集是「让人快速判断」", g:`<p><b>一句话：</b>作品集不是「我做过什么」，是「别人能多快判断你做过什么」。</p>
+<ul>
+<li><b>结构</b>：一句话定位 → 3 个 demo → 1 个微调模型 → 方法与局限。</li>
+<li>每个 Space 有 README、示例输入、许可证。</li>
+<li>模型卡写清底座、数据、评测，别只贴分数。</li>
+<li><b>固定 revision</b>，别让链接指向会变的 main。</li>
+<li>首页做索引：每个项目一句话 + 一个链接。</li>
+</ul>
+<p><b>常见坑：</b>只有 demo 没有说明；链接失效；满屏术语，外行看不懂；没有许可证，别人不敢用。</p>
+<p><b>怎么算过关：</b>把链接发给一个外行，他能说出你在做什么、怎么试、结果说明什么。</p>` }
+};
+
+for (const lv of LEVELS) for (const it of lv.items) {
+  const gd = GUIDES[it.id];
+  if (gd && !it.g) { it.gt = gd.gt; it.g = gd.g; }
+}
 
 const QUESTS = [
   { id:"q1", tag:"OBSERVE", t:"追踪今日 trending 榜首", d:"打开实时榜第 1 名，读它的 model card，用三句话写出：解决什么问题 / 谁在用 / 有什么限制。" },
@@ -1025,9 +1584,10 @@ function renderPath(){
       html += `<div class="item ${on ? "done" : ""}">
         <button class="ck" role="checkbox" aria-checked="${on}" data-act="lesson" data-id="${it.id}" aria-label="标记完成"></button>
         <div class="body">
-          <div class="t">${esc(it.t)}<a class="lnk" href="${lk.href}" target="_blank" rel="noopener"${lk.official ? ' title="镜像站不提供这个页面，固定打开官方站"' : ""}>${lk.label} ↗</a>${lk.official ? '<span class="offb">官方</span>' : ""}</div>
+          <div class="t">${esc(it.t)}<a class="lnk" href="${lk.href}" target="_blank" rel="noopener"${lk.official ? ' title="镜像站不提供这个页面，固定打开官方站"' : ""}>${lk.label} ↗</a>${lk.official ? '<span class="offb">官方</span>' : ""}${it.x ? '<span class="extb">拓展</span>' : ""}</div>
           <div class="d">${esc(it.d)}</div>
           ${it.g ? `<details class="guide"><summary>${esc(it.gt || "中文导读")}</summary><div class="gb">${it.g}</div></details>` : ""}
+          ${it.x ? `<details class="guide ext"><summary>${esc(it.xt || "拓展阅读")}</summary><div class="gb">${it.x}</div></details>` : ""}
           <input class="note" type="text" data-note="${it.id}" placeholder="一句话笔记：这课我学到了…"
                  value="${esc(S.notes[it.id] || "")}">
         </div>
